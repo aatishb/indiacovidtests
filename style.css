@@ -33,8 +33,8 @@ body {
   font-size:1rem;
   line-height: 1.5rem;
   font-weight: 400;
-  color: #440a67;
-  background-color: #fffcf8;
+  color: rgb(60,10,90);
+  background-color: rgb(255,253,251);
   /* anti-aliasing for crisper fonts */
   -webkit-font-smoothing: subpixel-antialiased;
   text-rendering: optimizeLegibility;
