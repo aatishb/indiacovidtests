@@ -18,7 +18,7 @@
 
     <h2>What Percentage of COVID Tests are Positive in Indian States?</h2>
 
-    <p>To reopen a region, the World Health Organization recommends that the percentage of positive COVID tests should be <a href="https://apps.who.int/iris/bitstream/handle/10665/332073/WHO-2019-nCoV-Adjusting_PH_measures-Criteria-2020.1-eng.pdf">5 percent or less</a>. This means that out of every 100 tests conducted, no more than 5 tests should be positive on average.</p>
+    <p>To reopen a region, the World Health Organization recommends that <b>the percentage of positive COVID tests should be <a href="https://apps.who.int/iris/bitstream/handle/10665/332073/WHO-2019-nCoV-Adjusting_PH_measures-Criteria-2020.1-eng.pdf">5 percent or less</a></b>. This means that out of every 100 tests conducted, no more than 5 tests should be positive on average.</p>
 
     <!--
     <button>Table View</button>
@@ -26,11 +26,11 @@
     <button>Map View</button>
     -->
 
-    <h2>States <span style="color:#378b37;">that meet</span> WHO reopening standards:  <span style="color:#378b37;">{{statesWithLowPositivity.length}}</span></h2>
+    <h2>States <span style="color:#378b37;">meeting</span> WHO standards:  <span style="color:#378b37;">{{statesWithLowPositivity.length}}</span></h2>
 
     <statetable :statedata="statesWithLowPositivity"></statetable>
 
-    <h2>States <span style="color:crimson;">that don't meet</span> WHO reopening standards: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
+    <h2>States <span style="color:crimson;">not meeting</span> WHO standards: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
 
     <statetable :statedata="statesWithHighPositivity"></statetable>
 
