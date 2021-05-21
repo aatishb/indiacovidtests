@@ -12,9 +12,9 @@ Vue.component('statetable', {
         <td>{{(100 * state.positivityrate).toFixed(1) + '%'}}</td>
         <td>
           <span :style="{color: state.change > 0 ? 'crimson' : '#378b37'}" v-if="Math.round(Math.abs(100*state.change)) > 0">
-            <b>{{state.change > 0 ? 'Up' : 'Down'}}</b> {{(100 * state.change).toFixed(1) + '%'}}
+            <b>{{state.change > 0 ? '▲' : '▼'}}</b> {{(100 * state.change).toFixed(1) + '%'}}
           </span>
-          <span v-else>Stable {{(100 * state.change).toFixed(1) + '%'}}</span>
+          <span v-else><span style="vertical-align: -0.25rem; super; font-size: 1.75rem;">≈</span> {{(100 * state.change).toFixed(1) + '%'}}</span>
         </td>
       </tr>
     </table> 
