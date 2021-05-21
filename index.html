@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>India Test Positivity</title>
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css?family=Unica+One|Vollkorn&display=swap" rel="stylesheet">
+  <script src="../libraries/vue.js"></script>
+  <script src="../libraries/plotly.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="normalize.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+
+</head>
+<body>
+
+  <div id="root" class="container">
+
+    <h2>Which Indian States Meet WHO Standards For Reopening?</h2>
+
+    <p>For a region to safely reopen, the World Health Organization recommends the the percentage of new COVID tests that come back positive should be 5 percent or less. This means that out of every 100 tests conducted in the region, no more than 5 tests should be positive on average.</p>
+
+    <button>Table View</button>
+    <button>Graph View</button>
+    <button>Map View</button>
+
+
+    <h2>States that don't meet WHO standards: </h2>
+    <table>
+      <tr>
+        <th>State</th>
+        <th>Percentage of Positive Tests</th>
+        <th>Trend</th>
+      </tr>
+      <tr>
+        <td>Jill</td>
+        <td>50</td>
+        <td>Up</td>
+      </tr>
+      <tr>
+        <td>Eve</td>
+        <td>94</td>
+        <td>Down</td>
+      </tr>
+    </table> 
+
+    <h2>States that meet WHO standards: </h2>
+
+
+  </div>
+
+  <!-- page code -->
+  <script src="vue-definitions.js"></script>
+
+</body>
+</html>
