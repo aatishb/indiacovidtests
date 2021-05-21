@@ -112,11 +112,11 @@ let app = new Vue({
 
   computed: {
     statesWithHighPositivity() {
-      return this.recentData.filter(e => e.positivityrate > 0.05);
+      return this.recentData.filter(e => e.positivityrate >= 0.05);
     },
 
     statesWithLowPositivity() {
-      return this.recentData.filter(e => e.positivityrate <= 0.05);
+      return this.recentData.filter(e => e.positivityrate < 0.05);
     },
 
   },
