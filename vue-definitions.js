@@ -1,13 +1,13 @@
 Vue.component('statetable', {
-  props: ['data'],
+  props: ['statedata'],
   template: `<div>
     <table>
       <tr>
-        <th><b>State / Union Territory</b></th>
-        <th><b>Percentage of Positive Tests</b> (in the past week)</th>
-        <th><b>Trend</b> <br>(1 week change)</th>
+        <th class="columntitle" @click="key = 'state'"><b>State / Union Territory</b></th>
+        <th class="columntitle" @click="key = 'positivityrate'"><b>Percentage of Positive Tests</b> (in the past week)</th>
+        <th class="columntitle" @click="key = 'change'"><b>Trend</b> <br>(1 week change)</th>
       </tr>
-      <tr v-for="(state,i) in data" :key="i">
+      <tr v-for="(state,i) in sort(statedata,key)" :key="i">
         <td>{{state.state}}</td>
         <td>{{(100 * state.positivityrate).toFixed(1) + '%'}}</td>
         <td>
@@ -18,7 +18,24 @@ Vue.component('statetable', {
         </td>
       </tr>
     </table> 
-  </div>`
+  </div>`,
+
+  methods: {
+    sort(data, key) {
+      if(key == 'state') {
+        return this.statedata.sort((a,b) => a[key] > b[key] ? 1 : -1);
+      } else {
+        return this.statedata.sort((a,b) => parseFloat(b[key]) - parseFloat(a[key]));        
+      }
+    }
+
+  },
+
+  data() {
+    return {
+      key: 'positivityrate'
+    };
+  },
 
 });
 
@@ -95,27 +112,11 @@ let app = new Vue({
 
   computed: {
     statesWithHighPositivity() {
-      let output = this.recentData.filter(e => e.positivityrate > 0.05);
-
-      if(this.sortHighPositivity == 'state') {
-        output = output.sort((a,b) => a[this.sortHighPositivity] - b[this.sortHighPositivity]);
-      } else {
-        output = output.sort((a,b) => parseFloat(b[this.sortHighPositivity]) - parseFloat(a[this.sortHighPositivity]));        
-      }
-
-      return output;
+      return this.recentData.filter(e => e.positivityrate > 0.05);
     },
 
     statesWithLowPositivity() {
-      let output = this.recentData.filter(e => e.positivityrate <= 0.05); 
-
-      if(this.sortLowPositivity == 'state') {
-        output = output.sort((a,b) => a[this.sortLowPositivity] - b[this.sortLowPositivity]);
-      } else {
-        output = output.sort((a,b) => parseFloat(b[this.sortLowPositivity]) - parseFloat(a[this.sortLowPositivity]));        
-      }
-
-      return output;
+      return this.recentData.filter(e => e.positivityrate <= 0.05);
     },
 
   },
@@ -124,8 +125,6 @@ let app = new Vue({
     states: ['Andaman and Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhattisgarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir', 'Jharkhand', 'Karnataka', 'Kerala', 'Ladakh', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'],
     allData: [],
     recentData: [],
-    sortHighPositivity: 'positivityrate',
-    sortLowPositivity: 'positivityrate',
     lastUpdated: new Date()
   }
 

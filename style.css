@@ -123,6 +123,17 @@ blockquote {
   margin-bottom: 50px;
 }
 
+
+.columntitle {
+    -webkit-transition: color 0.5s;
+    transition: color 0.5s;
+}
+
+.columntitle:hover {
+    color: #00aeef;
+    text-decoration: underline;
+}
+
 /* For devices larger than 400px */
 @media (min-width: 400px) {
   .container {
