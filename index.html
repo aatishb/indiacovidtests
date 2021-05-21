@@ -16,36 +16,29 @@
 
   <div id="root" class="container">
 
-    <h2>Which Indian States Meet WHO Standards For Reopening?</h2>
+    <h2>Which Indian States Can Reopen?</h2>
 
-    <p>For a region to reopen, the World Health Organization recommends the the percentage of new COVID tests that come back positive should be 5 percent or less. This means that <b>out of every 100 tests conducted in the region, no more than 5 tests should be positive</b> on average.</p>
+    <p>To reopen a region, the World Health Organization recommends that the percentage of COVID tests that are positive should be <a href="https://apps.who.int/iris/bitstream/handle/10665/332073/WHO-2019-nCoV-Adjusting_PH_measures-Criteria-2020.1-eng.pdf">5 percent or less</a>. This means that out of every 100 tests conducted in the region, no more than 5 tests should be positive (on average).</p>
 
+    <!--
     <button>Table View</button>
-    <button>Graph View</button>
+    <button>Chart View</button>
     <button>Map View</button>
+    -->
 
-    <h2>States <span style="color:crimson;">not meeting</span> WHO reopening standards: </h2>
-    <table>
-      <tr>
-        <th><b>State / Union Territory</b></th>
-        <th><b>Percentage of Positive Tests</b> (in the past week)</th>
-        <th><b>Trend</b> (two week change in % of positive tests)</th>
-      </tr>
-      <tr>
-        <td>Jill</td>
-        <td>50</td>
-        <td>Up</td>
-      </tr>
-      <tr>
-        <td>Eve</td>
-        <td>94</td>
-        <td>Down</td>
-      </tr>
-    </table> 
+    <h2>States <span style="color:#378b37;">that meet</span> WHO reopening standards:  <span style="color:#378b37;">{{statesWithLowPositivity.length}}</span></h2>
 
-    <h2>States <span style="color:#378b37;">meeting</span> WHO reopening standards: </h2>
+    <statetable :data="statesWithLowPositivity"></statetable>
 
-    <p>Click on any state for more detailed COVID testing information. This page was last updated on: date</p>
+    <h2>States <span style="color:crimson;">that don't meet</span> WHO reopening standards: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
+
+    <statetable :data="statesWithHighPositivity"></statetable>
+
+    <br>
+
+    <p>State data provided by <a href="https://api.covid19india.org/">Covid19India.org</a>. District data provided by <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a>. The data is available on <a href="https://github.com/aatishb/indiatestpositivitydata">GitHub</a>.</p>
+
+    <p>This page was last updated on {{lastUpdated.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}) }}.</p>
 
   </div>
 
