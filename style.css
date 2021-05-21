@@ -116,7 +116,6 @@ blockquote {
   position: relative;
   width: 100%;
   max-width: 700px;
-  min-width: 400px;
   margin: 0 auto;
   padding: 0 20px;
   box-sizing: border-box;
@@ -135,18 +134,12 @@ blockquote {
 }
 
 /* For devices larger than 400px */
-@media (min-width: 400px) {
-  .container {
-    width: 85%;
-    padding: 0; }
-}
-
-/* For devices larger than 550px */
-@media (min-width: 550px) {
-  .container {
-    width: 80%;
+@media (max-width: 400px) {
+  .columntitle {
+     font-size: 0.75rem;
   }
 }
+
 
 ul {
   margin:10px 0;
