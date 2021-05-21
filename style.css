@@ -33,8 +33,8 @@ body {
   font-size:1rem;
   line-height: 1.5rem;
   font-weight: 400;
-  color: black;
-  background-color: rgb(250,250,250);
+  color: #440a67;
+  background-color: #fffcf8;
   /* anti-aliasing for crisper fonts */
   -webkit-font-smoothing: subpixel-antialiased;
   text-rendering: optimizeLegibility;
@@ -116,6 +116,7 @@ blockquote {
   position: relative;
   width: 100%;
   max-width: 700px;
+  min-width: 400px;
   margin: 0 auto;
   padding: 0 20px;
   box-sizing: border-box;
