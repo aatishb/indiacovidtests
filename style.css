@@ -34,7 +34,7 @@ body {
   line-height: 1.5rem;
   font-weight: 400;
   color: rgb(60,10,90);
-  background-color: rgb(255,253,251);
+  background-color: rgb(255,255,245);
   /* anti-aliasing for crisper fonts */
   -webkit-font-smoothing: subpixel-antialiased;
   text-rendering: optimizeLegibility;
@@ -133,10 +133,25 @@ blockquote {
     text-decoration: underline;
 }
 
+.fullwidth {
+  width: 80vw;
+  position: relative;
+  left: calc(-40vw + 50%);
+}
+
 /* For devices larger than 400px */
 @media (max-width: 400px) {
+  table {
+     font-size: 0.75rem;    
+  }
+
   .columntitle {
-     font-size: 0.75rem;
+     font-size: 0.66rem;
+  }
+
+  .fullwidth {
+    width: 100vw;
+    left: calc(-50vw + 50%);
   }
 }
 

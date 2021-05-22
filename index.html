@@ -7,7 +7,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css?family=Unica+One|Vollkorn&display=swap" rel="stylesheet">
   <script src="libraries/vue.js"></script>
-  <script src="libraries/plotly.min.js"></script>
+  <!--<script src="libraries/plotly.min.js"></script>-->
+  <script src="https://d3js.org/d3.v4.js"></script>
   <link rel="stylesheet" type="text/css" href="normalize.css">
   <link rel="stylesheet" type="text/css" href="style.css">
 
@@ -20,19 +21,25 @@
 
     <p>The World Health Organization recommends that <b>the percentage of positive COVID tests should be <a href="https://apps.who.int/iris/bitstream/handle/10665/332073/WHO-2019-nCoV-Adjusting_PH_measures-Criteria-2020.1-eng.pdf">less than 5 percent</a></b> before reopening a region. This means that out of every 100 tests conducted, fewer than 5 tests should be positive on average.</p>
 
+    <button @click="viewMode = 'table'">Table View</button>
+    <button @click="viewMode = 'chart'">Chart View</button>
     <!--
-    <button>Table View</button>
-    <button>Chart View</button>
     <button>Map View</button>
     -->
 
-    <h2>States <span style="color:#378b37;">meeting</span> WHO standards:  <span style="color:#378b37;">{{statesWithLowPositivity.length}}</span></h2>
+    <div v-if="viewMode == 'table'">
+      <h2>States <span style="color:#378b37;">meeting</span> WHO standards:  <span style="color:#378b37;">{{statesWithLowPositivity.length}}</span></h2>
 
-    <statetable :statedata="statesWithLowPositivity"></statetable>
+      <statetable :statedata="statesWithLowPositivity"></statetable>
 
-    <h2>States <span style="color:crimson;">not meeting</span> WHO standards: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
+      <h2>States <span style="color:crimson;">not meeting</span> WHO standards: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
 
-    <statetable :statedata="statesWithHighPositivity"></statetable>
+      <statetable :statedata="statesWithHighPositivity"></statetable>
+    </div>
+
+    <div v-if="viewMode == 'chart'" class="fullwidth">
+      <chart :statedata="recentData"></chart>
+    </div>
 
     <br>
 
