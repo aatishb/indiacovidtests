@@ -59,12 +59,16 @@
 
       <div class="container">
         <div>
-          <input type="checkbox" id="showchange" v-model="showchange">
-          <label for="showchange">Show 1 Week Change</label>      
+          Show 
+          <select v-model="selectedChart">
+            <option v-for="option in options" v-bind:value="option.value">
+              {{ option.text }}
+            </option>
+          </select>
         </div>
       </div>
 
-      <chart :statedata="recentData" :showchange="showchange" class="fullwidth"></chart>
+      <chart :statedata="recentData" :selected="selectedChart" class="fullwidth"></chart>
 
       <div class="container">
         <p>The numbers in this chart represent a 1 week average. The shaded green region denotes the WHO testing standard for reopening. <span v-if="showchange">The dark circles indicate current values and light circles indicate values one week ago.</span></p>

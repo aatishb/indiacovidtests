@@ -105,22 +105,30 @@ Vue.component('gridmap', {
 
 Vue.component('chart', {
   
-  props: ['statedata', 'showchange'],
+  props: ['statedata', 'selected'],
 
   template: '<div id="chart"></div>',
 
   methods: {
     drawGraph() {
-      let xmax = this.statedata.map(e => e.positivityrate).reduce((a,b) => a > b ? a : b);
-      xmax = 5*(Math.ceil(100*xmax/5))/100;
 
-      if (this.showchange) {
+      let xmax;
+
+      if (this.selected == 'positivityrate') {
+        xmax = this.statedata.map(e => e.positivityrate).reduce((a,b) => a > b ? a : b);
+        xmax = 5*(Math.ceil(100*xmax/5))/100;
+
+      } else if (this.selected == 'change') {
+        xmax = this.statedata.map(e => e.positivityrate).reduce((a,b) => a > b ? a : b);
+        xmax = 5*(Math.ceil(100*xmax/5))/100;
         let xmax2 = this.statedata.map(e => e.pastpositivityrate).reduce((a,b) => a > b ? a : b);
         xmax2 = 5*(Math.ceil(100*xmax2/5))/100;
         xmax = Math.max(xmax, xmax2);
+      } else if (this.selected == 'weeklytestspercapita') {
+        xmax = 50;        
       }
 
-      let data = this.statedata.sort((a,b) => parseFloat(b.positivityrate) - parseFloat(a.positivityrate));
+      let data = this.selected == 'weeklytestspercapita' ? this.statedata.sort((a,b) => parseFloat(b.weeklytestspercapita) - parseFloat(a.weeklytestspercapita)) : this.statedata.sort((a,b) => parseFloat(b.positivityrate) - parseFloat(a.positivityrate));
 
 
       // set the dimensions and margins of the graph
@@ -142,19 +150,25 @@ Vue.component('chart', {
         var x = d3.scaleLinear()
           .domain([0, xmax])
           .range([ 0, width]);
-        svg.append("g")
-          .attr("transform", "translate(0,0)")
-          .call(d3.axisTop(x).tickFormat(d3.format(".0%")))
-          //.selectAll("text")
-          //  .attr("transform", "translate(-10,0)rotate(-45)")
-          //  .style("text-anchor", "end");
 
-      svg.append("rect")
-              .attr("x", 0)
-              .attr("y", 0)
-              .attr("width", x(0.05))
-              .attr("height", height)
-              .style("fill", 'rgba(0,255,0,0.25)');
+        if (this.selected == 'weeklytestspercapita') {
+          svg.append("g")
+            .attr("transform", "translate(0,0)")
+            .call(d3.axisTop(x));
+        } else {
+          svg.append("g")
+            .attr("transform", "translate(0,0)")
+            .call(d3.axisTop(x).tickFormat(d3.format(".0%")));          
+        }
+
+      if (this.selected == 'change' || this.selected == 'positivityrate') {
+        svg.append("rect")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", x(0.05))
+                .attr("height", height)
+                .style("fill", 'rgba(0,255,0,0.25)');
+      }
 
       // Y axis
       var y = d3.scaleBand()
@@ -169,13 +183,13 @@ Vue.component('chart', {
         .attr("text-anchor", "middle")
         .attr("x", width/2)
         .attr("y", -30)
-        .text("What percentage of COVID tests are positive?")
+        .text(this.selected == 'weeklytestspercapita' ? "Number of Weekly Tests (per 1,000 people)" : "What percentage of COVID tests are positive?")
         .style("font-family", "serif");
 
-      if (this.showchange) {
+      if (this.selected == 'change') {
 
         // Lines
-        svg.selectAll("myline")
+        svg.selectAll()
           .data(data)
           .enter()
           .append("line")
@@ -186,7 +200,7 @@ Vue.component('chart', {
             .attr("stroke", "rgba(0,0,0,0.2)");
 
         // Circles of variable 1
-        svg.selectAll("mycircle")
+        svg.selectAll()
           .data(data)
           .enter()
           .append("circle")
@@ -196,7 +210,7 @@ Vue.component('chart', {
             .style("fill", function(d) { return d.pastpositivityrate > 0.05 ? 'rgb(247,206,206)' : 'rgb(214,230,205)'; });
 
         // Circles of variable 2
-        svg.selectAll("mycircle")
+        svg.selectAll()
           .data(data)
           .enter()
           .append("circle")
@@ -205,10 +219,10 @@ Vue.component('chart', {
             .attr("r", "6")
             .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : '#378b37'; })
 
-      } else {
+      } else if (this.selected == 'positivityrate') {
 
         // Lines
-        svg.selectAll("myline")
+        let mylines = svg.selectAll()
           .data(data)
           .enter()
           .append("line")
@@ -219,7 +233,7 @@ Vue.component('chart', {
             .attr("stroke", "rgba(0,0,0,0.2)");
 
         // Circles
-        svg.selectAll("mycircle")
+        let mycircles = svg.selectAll()
           .data(data)
           .enter()
           .append("circle")
@@ -230,15 +244,46 @@ Vue.component('chart', {
 
 
         // Change the X coordinates of line and circle
-        svg.selectAll("circle")
-          .transition()
+        mycircles.transition()
           .duration(2000)
           .attr("cx", function(d) { return x(d.positivityrate); });
 
-        svg.selectAll("line")
-          .transition()
+        mylines.transition()
           .duration(2000)
           .attr("x1", function(d) { return x(d.positivityrate); });  
+
+      } else if (this.selected == 'weeklytestspercapita') {
+
+        // Lines
+        let mylines = svg.selectAll()
+          .data(data)
+          .enter()
+          .append("line")
+            .attr("x1", x(0))
+            .attr("x2", x(0))
+            .attr("y1", function(d) { return y(d.state); })
+            .attr("y2", function(d) { return y(d.state); })
+            .attr("stroke", "rgba(0,0,0,0.2)");
+
+        // Circles
+        let mycircles = svg.selectAll()
+          .data(data)
+          .enter()
+          .append("circle")
+            .attr("cx", x(0))
+            .attr("cy", function(d) { return y(d.state); })
+            .attr("r", "5")
+            .style("fill", function(d) { return 1000 * d.weeklytestspercapita < 10 ? 'crimson' : '#378b37'; })
+
+
+        // Change the X coordinates of line and circle
+        mycircles.transition()
+          .duration(2000)
+          .attr("cx", function(d) { return x(1000 * d.weeklytestspercapita); });
+
+        mylines.transition()
+          .duration(2000)
+          .attr("x1", function(d) { return x(1000 * d.weeklytestspercapita); });  
 
       }
     }
@@ -249,7 +294,7 @@ Vue.component('chart', {
   },
 
   watch: {
-    showchange() {
+    selected() {
       this.drawGraph();
     }
   }
@@ -262,9 +307,9 @@ Vue.component('statetable', {
     <table>
       <tr>
         <th class="columntitle" @click="key = 'state'"><b>State or Union Territory</b></th>
-        <th class="columntitle" @click="key = 'positivityrate'"><b>% Positive Tests</b> <br>(1 week average)</th>
-        <th v-if="showtrend" class="columntitle" @click="key = 'change'"><b>Trend</b> <br>(1 week change)</th>
-        <th v-if="showtestnumbers" class="columntitle" @click="key = 'weeklytestspercapita'"><b>Weekly Tests</b> <br>(per 1,000 people)</th>
+        <th class="columntitle" @click="key = 'positivityrate'"><b>% Positive Tests</b> <br><span class="light">(1 week average)</span></th>
+        <th v-if="showtrend" class="columntitle" @click="key = 'change'"><b>Trend</b> <br><span class="light">(1 week change)</span></th>
+        <th v-if="showtestnumbers" class="columntitle" @click="key = 'weeklytestspercapita'"><b>Weekly Tests</b> <br><span class="light">(per 1,000 people)</span></th>
       </tr>
       <tr v-for="(state,i) in sort(statedata,key)" :key="i">
         <td>{{state.state}}</td>
@@ -398,7 +443,15 @@ let app = new Vue({
     lastUpdated: new Date(),
     showtestnumbers: false,
     showtrend: true,
-    showchange: false
+    showchange: false,
+    selectedChart: 'positivityrate',
+    options: [
+      { text: 'Percentage of Positive Tests', value: 'positivityrate' },
+      { text: 'Trend (1 week change)', value: 'change' },
+      { text: 'Weekly Tests (per 1,000 people)', value: 'weeklytestspercapita' }
+    ]
+
+
   }
 
 });
