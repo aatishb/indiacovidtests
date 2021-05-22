@@ -72,7 +72,7 @@
 
     </div>
 
-    <div v-if="viewMode == 'map'">
+    <div v-if="viewMode == 'map'" class="fullwidth">
 
       <gridmap></gridmap>
 
@@ -80,7 +80,7 @@
 
     <div class="container">
 
-      <p>State data provided by <a href="https://api.covid19india.org/">Covid19India.org</a>. District data provided by <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a>. The data is available on <a href="https://github.com/aatishb/indiatestpositivitydata">GitHub</a>.</p>
+      <p>State data provided by <a href="https://api.covid19india.org/">Covid19India.org</a>. District data provided by the Indian <a href="https://www.mohfw.gov.in/">Ministry of Health</a>. Data & methodology available on <a href="https://github.com/aatishb/indiatestpositivitydata">GitHub</a>.</p>
 
       <p>This page was last updated on {{lastUpdated.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}) }}.</p>
     </div>

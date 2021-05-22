@@ -169,7 +169,8 @@ Vue.component('chart', {
         .attr("text-anchor", "middle")
         .attr("x", width/2)
         .attr("y", -30)
-        .text("What percentage of COVID tests are positive?");
+        .text("What percentage of COVID tests are positive?")
+        .style("font-family", "serif");
 
       if (this.showchange) {
 
