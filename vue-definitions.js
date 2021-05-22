@@ -1,3 +1,108 @@
+// map code adapted from https://bl.ocks.org/officeofjane/d33d6ef783993b60b15a3fe0f8da1481
+
+Vue.component('gridmap', {
+  
+  props: [],
+
+  template: '<div id="map"></div>',
+
+  methods: {
+    drawGraph() {
+      var config = {
+        width : 960,
+        height : 450,
+        padding : 30,
+        projection : d3.geoMercator(),
+        duration : 1000,
+        key:function(d){return d.properties.code; },
+        grid : {
+          GS: {x: 2, y: 4 },
+          QH: {x: 1, y: 4 },
+          GX: {x: 5, y: 7 },
+          GZ: {x: 4, y: 6 },
+          CQ: {x: 4, y: 5 },
+          BJ: {x: 7, y: 3 },
+          FJ: {x: 7, y: 6 },
+          AH: {x: 6, y: 5 },
+          GD: {x: 6, y: 7 },
+          XZ: {x: 2, y: 5 },
+          XJ: {x: 0, y: 3 },
+          HI: {x: 6, y: 8 },
+          NX: {x: 3, y: 4 },
+          SN: {x: 4, y: 4 },
+          SX: {x: 5, y: 4 },
+          HB: {x: 5, y: 5 },
+          HN: {x: 5, y: 6 },
+          SC: {x: 3, y: 5 },
+          YN: {x: 3, y: 6 },
+          HE: {x: 6, y: 3 },
+          HA: {x: 6, y: 4 },
+          LN: {x: 7, y: 2 },
+          SD: {x: 8, y: 3 },
+          TJ: {x: 9, y: 3 },
+          JX: {x: 6, y: 6 },
+          JS: {x: 7, y: 4 },
+          SH: {x: 8, y: 4 },
+          ZJ: {x: 7, y: 5 },
+          JL: {x: 8, y: 2 },
+          NM: {x: 6, y: 2 },
+          HK: {x: 9, y: 1 }    
+        }
+      };
+
+      // svg container
+      var svg = d3.select('#map')
+        .append('svg')
+        .attr('width',config.width)
+        .attr('height',config.height);
+
+      // colour scale
+      var colours = d3.scaleQuantile()
+        .range(['#ffffe0','#ffd59b','#ffa474','#f47461','#db4551','#b81b34','#8b0000']);
+
+      var g2r = new geo2rect.draw();
+
+      d3.queue()
+        .defer(d3.json, "china.geojson")
+        .defer(d3.csv, "electricity2015.csv", function(d) {
+          d.value = +d.value;
+          return d;
+        })
+        .await(ready);
+
+      function ready(error, provinces, electricity) {
+        var geojson = geo2rect.compute(provinces);
+        g2r.config = config;
+        g2r.data = geojson;
+        g2r.svg = svg.append('g');
+        g2r.draw();
+
+        colours.domain(d3.extent(electricity, function(d) { return d.value; }))
+
+        electricity.forEach(function(d) {
+          d3.selectAll("svg .id-" + d.code)
+            .style("fill", colours(d.value))
+        })
+      }
+
+      d3.select('#map').on('click', function(){
+        g2r.toggle();
+        g2r.draw();
+        // console.log(g2r.mode);
+      });
+
+    }
+  },
+
+  mounted() {
+    this.drawGraph();
+  },
+
+  watch: {
+  }
+
+});
+
 Vue.component('chart', {
   
   props: ['statedata', 'showchange'],
@@ -119,9 +224,8 @@ Vue.component('chart', {
           .append("circle")
             .attr("cx", x(0))
             .attr("cy", function(d) { return y(d.state); })
-            .attr("r", "4")
+            .attr("r", "5")
             .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : '#378b37'; })
-            .attr("stroke", "black");
 
 
         // Change the X coordinates of line and circle

@@ -8,6 +8,8 @@
   <script src="libraries/vue.js"></script>
   <!--<script src="libraries/plotly.min.js"></script>-->
   <script src="https://d3js.org/d3.v4.js"></script>
+  <script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
+  <script src="geo2rect.js"></script>
   <link rel="stylesheet" type="text/css" href="normalize.css">
   <link rel="stylesheet" type="text/css" href="style.css">
 
@@ -24,9 +26,7 @@
       <div style="margin-bottom: 1rem;">
         <button @click="viewMode = 'table'">Table View</button>
         <button @click="viewMode = 'chart'">Chart View</button>
-        <!--
-        <button>Map View</button>
-        -->
+        <button @click="viewMode = 'map'">Map View</button>
       </div>
     </div>
 
@@ -69,6 +69,12 @@
       <div class="container">
         <p>The numbers in this chart represent a 1 week average. The shaded green region denotes the WHO testing standard for reopening. <span v-if="showchange">The dark circles indicate current values and light circles indicate values one week ago.</span></p>
       </div>
+
+    </div>
+
+    <div v-if="viewMode == 'map'">
+
+      <gridmap></gridmap>
 
     </div>
 
