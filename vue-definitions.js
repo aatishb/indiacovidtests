@@ -94,19 +94,19 @@ Vue.component('chart', {
 });
 
 Vue.component('statetable', {
-  props: ['statedata', 'showtestnumbers'],
+  props: ['statedata', 'showtestnumbers', 'showtrend'],
   template: `<div>
     <table>
       <tr>
         <th class="columntitle" @click="key = 'state'"><b>State or Union Territory</b></th>
         <th class="columntitle" @click="key = 'positivityrate'"><b>% Positive Tests</b> <br>(1 week average)</th>
-        <th class="columntitle" @click="key = 'change'"><b>Trend</b> <br>(1 week change)</th>
+        <th v-if="showtrend" class="columntitle" @click="key = 'change'"><b>Trend</b> <br>(1 week change)</th>
         <th v-if="showtestnumbers" class="columntitle" @click="key = 'weeklytestspercapita'"><b>Weekly Tests</b> <br>(per 1,000 people)</th>
       </tr>
       <tr v-for="(state,i) in sort(statedata,key)" :key="i">
         <td>{{state.state}}</td>
         <td>{{(100 * state.positivityrate).toFixed(1) + '%'}}</td>
-        <td>
+        <td v-if="showtrend">
           <span :style="{color: state.change > 0 ? 'crimson' : '#378b37'}" v-if="Math.round(Math.abs(100*state.change)) > 0">
             <b>{{state.change > 0 ? '▲' : '▼'}}</b> {{(100 * state.change).toFixed(1) + '%'}}
           </span>
@@ -233,6 +233,7 @@ let app = new Vue({
     recentData: [],
     lastUpdated: new Date(),
     showtestnumbers: false,
+    showtrend: true
   }
 
 });

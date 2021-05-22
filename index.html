@@ -32,17 +32,22 @@
     <div v-if="viewMode == 'table'">
 
       <div>
+        <input type="checkbox" id="showtrend" v-model="showtrend">
+        <label for="showtrend">Show Trend</label>      
+      </div>
+
+      <div>
         <input type="checkbox" id="showtestnumbers" v-model="showtestnumbers">
-        <label for="showtestnumbers">Show how many tests each state conducts</label>      
+        <label for="showtestnumbers">Show Number of Tests</label>      
       </div>
 
       <h2>States <span style="color:#378b37;">meeting</span> WHO standards:  <span style="color:#378b37;">{{statesWithLowPositivity.length}}</span></h2>
 
-      <statetable :statedata="statesWithLowPositivity" :showtestnumbers="showtestnumbers"></statetable>
+      <statetable :statedata="statesWithLowPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
 
       <h2>States <span style="color:crimson;">not meeting</span> WHO standards: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
 
-      <statetable :statedata="statesWithHighPositivity" :showtestnumbers="showtestnumbers"></statetable>
+      <statetable :statedata="statesWithHighPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
       <br>
     </div>
 
