@@ -239,7 +239,7 @@ Vue.component('chart', {
           .append("circle")
             .attr("cx", x(0))
             .attr("cy", function(d) { return y(d.state); })
-            .attr("r", "5")
+            .attr("r", "6")
             .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : '#378b37'; })
 
 
@@ -272,7 +272,7 @@ Vue.component('chart', {
           .append("circle")
             .attr("cx", x(0))
             .attr("cy", function(d) { return y(d.state); })
-            .attr("r", "5")
+            .attr("r", "6")
             .style("fill", function(d) { return 1000 * d.weeklytestspercapita < 10 ? 'crimson' : '#378b37'; })
 
 

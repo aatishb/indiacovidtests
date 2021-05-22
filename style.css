@@ -121,8 +121,7 @@ blockquote {
 .container {
   max-width: 660px;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
+  padding: 0.5rem;
 }
 
 
@@ -169,7 +168,7 @@ ul li {
   }
 
   .columntitle {
-     font-size: 0.66rem;
+     font-size: 0.75rem;    
   }
 }
 
