@@ -65,7 +65,7 @@ Vue.component('chart', {
       .attr("text-anchor", "middle")
       .attr("x", width/2)
       .attr("y", -30)
-      .text("Percentage of tests that are positive");
+      .text("What percentage of Covid tests are positive?");
 
     // Lines
     svg.selectAll("myline")
@@ -94,14 +94,14 @@ Vue.component('chart', {
 });
 
 Vue.component('statetable', {
-  props: ['statedata'],
+  props: ['statedata', 'showtestnumbers'],
   template: `<div>
     <table>
       <tr>
         <th class="columntitle" @click="key = 'state'"><b>State or Union Territory</b></th>
         <th class="columntitle" @click="key = 'positivityrate'"><b>% Positive Tests</b> <br>(1 week average)</th>
         <th class="columntitle" @click="key = 'change'"><b>Trend</b> <br>(1 week change)</th>
-        <th class="columntitle" @click="key = 'weeklytestspercapita'"><b>Weekly Tests</b> <br>(per 1,000 people)</th>
+        <th v-if="showtestnumbers" class="columntitle" @click="key = 'weeklytestspercapita'"><b>Weekly Tests</b> <br>(per 1,000 people)</th>
       </tr>
       <tr v-for="(state,i) in sort(statedata,key)" :key="i">
         <td>{{state.state}}</td>
@@ -112,7 +112,7 @@ Vue.component('statetable', {
           </span>
           <span v-else><span style="vertical-align: -0.25rem; super; font-size: 1.75rem;">≈</span> {{(100 * state.change).toFixed(1) + '%'}}</span>
         </td>
-        <td>{{(1000 * state.weeklytestspercapita).toFixed(1)}}</td>
+        <td v-if="showtestnumbers">{{(1000 * state.weeklytestspercapita).toFixed(1)}}</td>
       </tr>
     </table> 
   </div>`,
@@ -231,7 +231,8 @@ let app = new Vue({
     },
     allData: [],
     recentData: [],
-    lastUpdated: new Date()
+    lastUpdated: new Date(),
+    showtestnumbers: false,
   }
 
 });
