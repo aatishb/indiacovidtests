@@ -1,95 +1,153 @@
 Vue.component('chart', {
   
-  props: ['statedata'],
+  props: ['statedata', 'showchange'],
 
   template: '<div id="chart"></div>',
 
-  mounted() {
+  methods: {
+    drawGraph() {
+      let xmax = this.statedata.map(e => e.positivityrate).reduce((a,b) => a > b ? a : b);
+      xmax = 5*(Math.ceil(100*xmax/5))/100;
 
-    let xmax = this.statedata.map(e => e.positivityrate).reduce((a,b) => a > b ? a : b);
-    xmax = 5*(Math.ceil(100*xmax/5))/100;
+      if (this.showchange) {
+        let xmax2 = this.statedata.map(e => e.pastpositivityrate).reduce((a,b) => a > b ? a : b);
+        xmax2 = 5*(Math.ceil(100*xmax2/5))/100;
+        xmax = Math.max(xmax, xmax2);
+      }
 
-    let data = this.statedata.sort((a,b) => parseFloat(b.positivityrate) - parseFloat(a.positivityrate));
+      let data = this.statedata.sort((a,b) => parseFloat(b.positivityrate) - parseFloat(a.positivityrate));
 
-    // set the dimensions and margins of the graph
-    var margin = {top: 50, right: 30, bottom: 10, left: 150},
-        width = 500 - margin.left - margin.right,
-        height = 800 - margin.top - margin.bottom;
 
-    // append the svg object to the body of the page
-    var svg = d3.select("#chart")
-      .append("svg")
-        .attr("viewBox", '0 0 ' + String(width + margin.left + margin.right) + ' ' + String(height + margin.top + margin.bottom))
-      .append("g")
-        .attr("transform",
-              "translate(" + margin.left + "," + margin.top + ")");
+      // set the dimensions and margins of the graph
+      var margin = {top: 50, right: 30, bottom: 10, left: 150},
+          width = 500 - margin.left - margin.right,
+          height = 800 - margin.top - margin.bottom;
 
-      // Add X axis
-      var x = d3.scaleLinear()
-        .domain([0, xmax])
-        .range([ 0, width]);
+      // append the svg object to the body of the page
+      d3.selectAll("svg").remove();
+
+      var svg = d3.select("#chart")
+        .append("svg")
+          .attr("viewBox", '0 0 ' + String(width + margin.left + margin.right) + ' ' + String(height + margin.top + margin.bottom))
+        .append("g")
+          .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
+        // Add X axis
+        var x = d3.scaleLinear()
+          .domain([0, xmax])
+          .range([ 0, width]);
+        svg.append("g")
+          .attr("transform", "translate(0,0)")
+          .call(d3.axisTop(x).tickFormat(d3.format(".0%")))
+          //.selectAll("text")
+          //  .attr("transform", "translate(-10,0)rotate(-45)")
+          //  .style("text-anchor", "end");
+
+      svg.append("rect")
+              .attr("x", 0)
+              .attr("y", 0)
+              .attr("width", x(0.05))
+              .attr("height", height)
+              .style("fill", 'rgba(0,255,0,0.25)');
+
+      // Y axis
+      var y = d3.scaleBand()
+        .range([ 0, height ])
+        .domain(this.statedata.map(function(d) { return d.state; }))
+        .padding(1);
       svg.append("g")
-        .attr("transform", "translate(0,0)")
-        .call(d3.axisTop(x).tickFormat(d3.format(".0%")))
-        //.selectAll("text")
-        //  .attr("transform", "translate(-10,0)rotate(-45)")
-        //  .style("text-anchor", "end");
+        .call(d3.axisLeft(y));
 
-    svg.append("rect")
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("width", x(0.05))
-            .attr("height", height)
-            .style("fill", 'rgba(0,255,0,0.25)');
+    svg.append("text")
+        .attr("class", "x label")
+        .attr("text-anchor", "middle")
+        .attr("x", width/2)
+        .attr("y", -30)
+        .text("What percentage of COVID tests are positive?");
 
-      /*
-      svg.append("line")
-         .attr("y1", 0)
-         .attr("y2", height)
-         .attr("x1", x(0.05))
-         .attr("x2", x(0.05))
-         .attr( "stroke", '#378b37' )
-         .attr( "stroke-width", "1" );
-      */
+      if (this.showchange) {
 
-    // Y axis
-    var y = d3.scaleBand()
-      .range([ 0, height ])
-      .domain(this.statedata.map(function(d) { return d.state; }))
-      .padding(1);
-    svg.append("g")
-      .call(d3.axisLeft(y));
+        // Lines
+        svg.selectAll("myline")
+          .data(data)
+          .enter()
+          .append("line")
+            .attr("x1", function(d) { return x(d.pastpositivityrate); })
+            .attr("x2", function(d) { return x(d.positivityrate); })
+            .attr("y1", function(d) { return y(d.state); })
+            .attr("y2", function(d) { return y(d.state); })
+            .attr("stroke", "rgba(0,0,0,0.2)");
 
-  svg.append("text")
-      .attr("class", "x label")
-      .attr("text-anchor", "middle")
-      .attr("x", width/2)
-      .attr("y", -30)
-      .text("What percentage of Covid tests are positive?");
+        // Circles of variable 1
+        svg.selectAll("mycircle")
+          .data(data)
+          .enter()
+          .append("circle")
+            .attr("cx", function(d) { return x(d.pastpositivityrate); })
+            .attr("cy", function(d) { return y(d.state); })
+            .attr("r", "6")
+            .style("fill", function(d) { return d.pastpositivityrate > 0.05 ? 'rgb(247,206,206)' : 'rgb(214,230,205)'; });
 
-    // Lines
-    svg.selectAll("myline")
-      .data(data)
-      .enter()
-      .append("line")
-        .attr("x1", function(d) { return x(d.positivityrate); })
-        .attr("x2", x(0))
-        .attr("y1", function(d) { return y(d.state); })
-        .attr("y2", function(d) { return y(d.state); })
-        .attr("stroke", "rgba(0,0,0,0.2)");
+        // Circles of variable 2
+        svg.selectAll("mycircle")
+          .data(data)
+          .enter()
+          .append("circle")
+            .attr("cx", function(d) { return x(d.positivityrate); })
+            .attr("cy", function(d) { return y(d.state); })
+            .attr("r", "6")
+            .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : '#378b37'; })
 
-    // Circles
-    svg.selectAll("mycircle")
-      .data(data)
-      .enter()
-      .append("circle")
-        .attr("cx", function(d) { return x(d.positivityrate); })
-        .attr("cy", function(d) { return y(d.state); })
-        .attr("r", "4")
-        .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : '#378b37'; })
-        .attr("stroke", "black");
+      } else {
 
+        // Lines
+        svg.selectAll("myline")
+          .data(data)
+          .enter()
+          .append("line")
+            .attr("x1", x(0))
+            .attr("x2", x(0))
+            .attr("y1", function(d) { return y(d.state); })
+            .attr("y2", function(d) { return y(d.state); })
+            .attr("stroke", "rgba(0,0,0,0.2)");
+
+        // Circles
+        svg.selectAll("mycircle")
+          .data(data)
+          .enter()
+          .append("circle")
+            .attr("cx", x(0))
+            .attr("cy", function(d) { return y(d.state); })
+            .attr("r", "4")
+            .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : '#378b37'; })
+            .attr("stroke", "black");
+
+
+        // Change the X coordinates of line and circle
+        svg.selectAll("circle")
+          .transition()
+          .duration(2000)
+          .attr("cx", function(d) { return x(d.positivityrate); });
+
+        svg.selectAll("line")
+          .transition()
+          .duration(2000)
+          .attr("x1", function(d) { return x(d.positivityrate); });  
+
+      }
+    }
   },
+
+  mounted() {
+    this.drawGraph();
+  },
+
+  watch: {
+    showchange() {
+      this.drawGraph();
+    }
+  }
 
 });
 
@@ -160,6 +218,7 @@ let app = new Vue({
           recentData.push({
             state: state,
             positivityrate: recentTPR,
+            pastpositivityrate: pastTPR,
             change: recentTPR - pastTPR,
             weeklytestspercapita: weeklytestspercapita
           });          
@@ -233,7 +292,8 @@ let app = new Vue({
     recentData: [],
     lastUpdated: new Date(),
     showtestnumbers: false,
-    showtrend: true
+    showtrend: true,
+    showchange: false
   }
 
 });

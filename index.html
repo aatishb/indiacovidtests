@@ -3,7 +3,6 @@
 <head>
   <title>India Test Positivity</title>
 
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css?family=Unica+One|Vollkorn&display=swap" rel="stylesheet">
   <script src="libraries/vue.js"></script>
@@ -15,50 +14,70 @@
 </head>
 <body>
 
-  <div id="root" class="container">
+  <div id="root">
 
-    <h2>What Percentage of COVID Tests are Positive in Indian States?</h2>
+    <div class="container">
+      <h2>What Percentage of COVID Tests are Positive in Indian States?</h2>
 
-    <p>The World Health Organization recommends that <b>the percentage of positive COVID tests should be <a href="https://apps.who.int/iris/bitstream/handle/10665/332073/WHO-2019-nCoV-Adjusting_PH_measures-Criteria-2020.1-eng.pdf">less than 5 percent</a></b> before reopening a region. This means that out of every 100 tests conducted, fewer than 5 tests should be positive on average.</p>
+      <p>Before reopening a region, the WHO recommends that <b>the percentage of COVID tests that are positive should be <a href="https://apps.who.int/iris/bitstream/handle/10665/332073/WHO-2019-nCoV-Adjusting_PH_measures-Criteria-2020.1-eng.pdf">less than 5 percent</a></b>. This means that out of 100 tests conducted, fewer than 5 should be positive on average.</p>
 
-    <div style="margin-bottom: 1rem;">
-      <button @click="viewMode = 'table'">Table View</button>
-      <button @click="viewMode = 'chart'">Chart View</button>
-      <!--
-      <button>Map View</button>
-      -->
+      <div style="margin-bottom: 1rem;">
+        <button @click="viewMode = 'table'">Table View</button>
+        <button @click="viewMode = 'chart'">Chart View</button>
+        <!--
+        <button>Map View</button>
+        -->
+      </div>
     </div>
 
     <div v-if="viewMode == 'table'">
+      <div class="container">
+        <div>
+          <input type="checkbox" id="showtrend" v-model="showtrend">
+          <label for="showtrend">Show Trend</label>      
+        </div>
 
-      <div>
-        <input type="checkbox" id="showtrend" v-model="showtrend">
-        <label for="showtrend">Show Trend</label>      
+        <div>
+          <input type="checkbox" id="showtestnumbers" v-model="showtestnumbers">
+          <label for="showtestnumbers">Show Number of Tests</label>      
+        </div>
+
+        <h2>States <span style="color:#378b37;">meeting</span> WHO standards:  <span style="color:#378b37;">{{statesWithLowPositivity.length}}</span></h2>
+
+        <statetable :statedata="statesWithLowPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
+
+        <h2>States <span style="color:crimson;">not meeting</span> WHO standards: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
+
+        <statetable :statedata="statesWithHighPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
+
       </div>
-
-      <div>
-        <input type="checkbox" id="showtestnumbers" v-model="showtestnumbers">
-        <label for="showtestnumbers">Show Number of Tests</label>      
-      </div>
-
-      <h2>States <span style="color:#378b37;">meeting</span> WHO standards:  <span style="color:#378b37;">{{statesWithLowPositivity.length}}</span></h2>
-
-      <statetable :statedata="statesWithLowPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
-
-      <h2>States <span style="color:crimson;">not meeting</span> WHO standards: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
-
-      <statetable :statedata="statesWithHighPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
       <br>
+
     </div>
 
     <div v-if="viewMode == 'chart'">
-      <chart :statedata="recentData" class="fullwidth"></chart>
-      <p>The percentages in this chart are a 1 week average.</p>
+
+      <div class="container">
+        <div>
+          <input type="checkbox" id="showchange" v-model="showchange">
+          <label for="showchange">Show 1 Week Change</label>      
+        </div>
+      </div>
+
+      <chart :statedata="recentData" :showchange="showchange" class="fullwidth"></chart>
+
+      <div class="container">
+        <p>The numbers in this chart represent a 1 week average. The shaded green region denotes the WHO testing standard for reopening. <span v-if="showchange">The dark circles indicate current values and light circles indicate values one week ago.</span></p>
+      </div>
+
     </div>
 
-    <p>State data provided by <a href="https://api.covid19india.org/">Covid19India.org</a>. District data provided by <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a>. The data is available on <a href="https://github.com/aatishb/indiatestpositivitydata">GitHub</a>.</p>
+    <div class="container">
 
-    <p>This page was last updated on {{lastUpdated.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}) }}.</p>
+      <p>State data provided by <a href="https://api.covid19india.org/">Covid19India.org</a>. District data provided by <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a>. The data is available on <a href="https://github.com/aatishb/indiatestpositivitydata">GitHub</a>.</p>
+
+      <p>This page was last updated on {{lastUpdated.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}) }}.</p>
+    </div>
 
   </div>
 
