@@ -28,18 +28,18 @@ th, td {
 }
 
 header {
-  background-color: rgb(40, 20, 70);
   padding-left: 0.25rem;
   padding-right: 0.25rem;
   font-size: 0.9rem;
-  color: #ffffde;
+  font-weight: 400;
+  color: rgb(40, 20, 70);
   display: flex;
   justify-content: space-between;
   font-family: 'Raleway', sans-serif;
 }
 
 header a {
-  color: #ffffde;
+  color: rgb(40, 20, 70);
   text-decoration: none;
 }
 
@@ -57,7 +57,7 @@ body {
 
 .light {
   font-weight: 300;
-  color: rgba(60,10,90,0.7);
+  color: rgb(40, 20, 70);
 }
 
 img {
