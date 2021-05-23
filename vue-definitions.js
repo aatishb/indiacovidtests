@@ -8,89 +8,74 @@ Vue.component('gridmap', {
 
   methods: {
     drawGraph() {
+
       var config = {
-        width : 960,
-        height : 450,
-        padding : 30,
+        width : 700,
+        height : 700,
+        padding : 70,
         projection : d3.geoMercator(),
         duration : 1000,
-        key:function(d){return d.properties.code; },
+        key:function(d){return d.properties.st_nm; },
         grid : {
-          GS: {x: 2, y: 4 },
-          QH: {x: 1, y: 4 },
-          GX: {x: 5, y: 7 },
-          GZ: {x: 4, y: 6 },
-          CQ: {x: 4, y: 5 },
-          BJ: {x: 7, y: 3 },
-          FJ: {x: 7, y: 6 },
-          AH: {x: 6, y: 5 },
-          GD: {x: 6, y: 7 },
-          XZ: {x: 2, y: 5 },
-          XJ: {x: 0, y: 3 },
-          HI: {x: 6, y: 8 },
-          NX: {x: 3, y: 4 },
-          SN: {x: 4, y: 4 },
-          SX: {x: 5, y: 4 },
-          HB: {x: 5, y: 5 },
-          HN: {x: 5, y: 6 },
-          SC: {x: 3, y: 5 },
-          YN: {x: 3, y: 6 },
-          HE: {x: 6, y: 3 },
-          HA: {x: 6, y: 4 },
-          LN: {x: 7, y: 2 },
-          SD: {x: 8, y: 3 },
-          TJ: {x: 9, y: 3 },
-          JX: {x: 6, y: 6 },
-          JS: {x: 7, y: 4 },
-          SH: {x: 8, y: 4 },
-          ZJ: {x: 7, y: 5 },
-          JL: {x: 8, y: 2 },
-          NM: {x: 6, y: 2 },
-          HK: {x: 9, y: 1 }    
+          'Andaman and Nicobar Islands': {x:8,y:7},
+          'Arunachal Pradesh': {x:8,y:1},
+          'Assam': {x:7,y:2},
+          'Bihar': {x:5,y:2},
+          'Chandigarh': {x:2,y:1},
+          'Chhattisgarh': {x:3,y:3},
+          'Dadra and Nagar Haveli and Daman and Diu': {x:1,y:4},
+          'Goa': {x:2,y:5},
+          'Gujarat': {x:0,y:3},
+          'Haryana': {x:2,y:2},
+          'Himachal Pradesh': {x:3,y:1},
+          'Jharkhand': {x:5,y:3},
+          'Karnataka': {x:2,y:6},
+          'Kerala': {x:2,y:7},
+          'Lakshadweep': {x:0,y:7},
+          'Madhya Pradesh': {x:2,y:3},
+          'Maharashtra': {x:2,y:4},
+          'Manipur': {x:8,y:3},
+          'Meghalaya': {x:7,y:3},
+          'Mizoram': {x:8,y:4},
+          'Nagaland': {x:8,y:2},
+          'Delhi': {x:3,y:2},
+          'Puducherry': {x:3,y:6},
+          'Punjab': {x:1,y:2},
+          'Rajasthan': {x:1,y:3},
+          'Sikkim': {x:6,y:1},
+          'Tamil Nadu': {x:3,y:7},
+          'Telangana': {x:3,y:4},
+          'Tripura': {x:7,y:4},
+          'Uttar Pradesh': {x:4,y:2},
+          'Uttarakhand': {x:4,y:1},
+          'West Bengal': {x:6,y:2},
+          'Odisha': {x:4,y:3},
+          'Andhra Pradesh': {x:3,y:5},
+          'Jammu and Kashmir': {x:2,y:0},
+          'Ladakh': {x:3,y:0}
         }
       };
 
-      // svg container
-      var svg = d3.select('#map')
-        .append('svg')
-        .attr('width',config.width)
-        .attr('height',config.height);
-
-      // colour scale
-      var colours = d3.scaleQuantile()
-        .range(['#ffffe0','#ffd59b','#ffa474','#f47461','#db4551','#b81b34','#8b0000']);
+      var svg = d3.select('#map').append('svg').attr('width',config.width).attr('height',config.height).style('fill','transparent').style('stroke', 'black');
 
       var g2r = new geo2rect.draw();
 
-      d3.queue()
-        .defer(d3.json, "china.geojson")
-        .defer(d3.csv, "electricity2015.csv", function(d) {
-          d.value = +d.value;
-          return d;
-        })
-        .await(ready);
+      d3.json('india.geojson', function(err, data){
+        console.log(data.features.map(e => e.properties.st_nm));
+        var geojson = geo2rect.compute(data);
 
-      function ready(error, provinces, electricity) {
-        var geojson = geo2rect.compute(provinces);
         g2r.config = config;
         g2r.data = geojson;
         g2r.svg = svg.append('g');
+
         g2r.draw();
-
-        colours.domain(d3.extent(electricity, function(d) { return d.value; }))
-
-        electricity.forEach(function(d) {
-          d3.selectAll("svg .id-" + d.code)
-            .style("fill", colours(d.value))
-        })
-      }
-
-      d3.select('#map').on('click', function(){
-        g2r.toggle();
-        g2r.draw();
-        // console.log(g2r.mode);
       });
 
+      d3.select('#map').append('a').text('Toggle').on('click', function(){
+        g2r.toggle();
+        g2r.draw();
+        //console.log(g2r.mode);
+      });
     }
   },
 
