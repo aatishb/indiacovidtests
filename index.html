@@ -76,17 +76,16 @@
 
     </div>
 
-    <div v-if="viewMode == 'map'" class="fullwidth">
-
+    <div v-if="viewMode == 'map'" class="container">
       <gridmap :statedata="recentData"></gridmap>
-
     </div>
 
     <div class="container">
 
-      <p>State data provided by <a href="https://api.covid19india.org/">Covid19India.org</a>. District data provided by the Indian <a href="https://www.mohfw.gov.in/">Ministry of Health</a>. Data & methodology available on <a href="https://github.com/aatishb/indiatestpositivitydata">GitHub</a>.</p>
-
       <p>This page was last updated on {{lastUpdated.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}) }}.</p>
+
+      <p>Data Source: <a href="https://api.covid19india.org/">Covid19India.org</a>. Data & methodology available on <a href="https://github.com/aatishb/indiatestpositivitydata">GitHub</a>.</p>
+
     </div>
 
   </div>

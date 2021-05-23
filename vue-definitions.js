@@ -4,9 +4,21 @@ Vue.component('gridmap', {
   
   props: ['statedata'],
 
-  template: '<div id="map"></div>',
+  template: `<div>
+    <div>
+      <button v-if="g2r !== null" @click="toggle">Switch to {{g2r.mode == 'geo' ? 'Grid' : 'Map'}} View</button>
+    </div>
+    <div id="map"></div>
+  </div>
+  `,
 
   methods: {
+    toggle() {
+        this.g2r.toggle();
+        this.g2r.draw();     
+        //console.log(this.g2r.mode);
+    },
+
     drawGraph() {
 
       var config = {
@@ -63,7 +75,8 @@ Vue.component('gridmap', {
       var colors = d3.scaleQuantile()
         .range(['#ffffe0','#ffd59b','#ffa474','#f47461','#db4551','#b81b34','#8b0000']);
 
-      var g2r = new geo2rect.draw();
+      let g2r = new geo2rect.draw();
+      this.g2r = g2r;
 
       d3.json('india.geojson', function(err, data){
         var geojson = geo2rect.compute(data);
@@ -72,6 +85,8 @@ Vue.component('gridmap', {
         g2r.data = geojson;
         g2r.svg = svg.append('g');
 
+        g2r.draw();
+        g2r.toggle();
         g2r.draw();
 
         colors.domain([0,0.35]);
@@ -83,11 +98,6 @@ Vue.component('gridmap', {
 
       });
 
-      d3.select('#map').append('a').text('Toggle').on('click', function(){
-        g2r.toggle();
-        g2r.draw();
-        //console.log(g2r.mode);
-      });
     }
   },
 
@@ -96,6 +106,12 @@ Vue.component('gridmap', {
   },
 
   watch: {
+  },
+
+  data() {
+    return {
+      g2r: null,
+    }
   }
 
 });
