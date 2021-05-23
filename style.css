@@ -27,13 +27,28 @@ th, td {
   display: block;
 }
 
+header {
+  background-color: rgb(40, 20, 70);
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  font-size: 0.9rem;
+  color: #ffffde;
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Raleway', sans-serif;
+}
+
+header a {
+  color: #ffffde;
+  text-decoration: none;
+}
 
 body {
   font-family: 'Open Sans', sans-serif;
   font-size:1rem;
   line-height: 1.5rem;
   font-weight: 400;
-  color: rgb(60,10,90);
+  color: rgb(40, 20, 70);
   background-color: rgb(254,252,242);
   /* anti-aliasing for crisper fonts */
   -webkit-font-smoothing: subpixel-antialiased;
