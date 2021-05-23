@@ -68,7 +68,29 @@ Vue.component('gridmap', {
         }
       };
 
-      var svg = d3.select('#map').append('svg').attr('width',config.width).attr('height',config.height).style('fill','transparent').style('stroke', 'black');
+
+      // set the dimensions and margins of the graph
+      var margin = {top: 30, right: 0, bottom: 0, left: 0},
+          width = 700 - margin.left - margin.right,
+          height = 700 - margin.top - margin.bottom;
+
+      var svg = d3.select("#map")
+        .append("svg")
+          .attr("viewBox", '0 0 ' + String(width + margin.left + margin.right) + ' ' + String(height + margin.top + margin.bottom))
+          .style('fill','transparent')
+          .style('stroke', 'black');
+
+    svg.append("text")
+        .attr("class", "x label")
+        .attr("text-anchor", "middle")
+        .attr("x", width/2)
+        .attr("y", 1.2 * margin.top)
+        .text("What Percentage of COVID Tests are Positive?")
+        .style('fill', 'black')
+        .style('stroke', 'none')
+        .style('font-size', '1.75rem')
+        .style("font-family", "serif");
+
       let statedata = this.statedata;
 
       // colour scale
@@ -196,7 +218,7 @@ Vue.component('chart', {
         .attr("text-anchor", "middle")
         .attr("x", width/2)
         .attr("y", -30)
-        .text(this.selected == 'weeklytestspercapita' ? "Number of Weekly Tests (per 1,000 people)" : "What percentage of COVID tests are positive?")
+        .text(this.selected == 'weeklytestspercapita' ? "Number of Weekly Tests (per 1,000 people)" : "What Percentage of COVID Tests are Positive?")
         .style("font-family", "serif");
 
       if (this.selected == 'change') {
