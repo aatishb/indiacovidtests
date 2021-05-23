@@ -15,6 +15,13 @@ Vue.component('gridmap', {
   methods: {
     toggle() {
         this.g2r.toggle();
+        if (this.g2r.mode == 'geo') {
+          d3.selectAll('.label').style('visibility', 'hidden');
+        } else {
+          setTimeout(function() {
+            d3.selectAll('.label').style('visibility', 'visible');          
+          }, 1000);
+        }
         this.g2r.draw();     
         //console.log(this.g2r.mode);
     },
@@ -22,57 +29,59 @@ Vue.component('gridmap', {
     drawGraph() {
 
       var config = {
-        width : 700,
-        height : 700,
-        padding : 30,
+        width : 660,
+        height : 660,
+        padding : 5,
         projection : d3.geoMercator(),
         duration : 1000,
         key:function(d){return d.properties.st_nm; },
         grid : {
-          'Andaman and Nicobar Islands': {x:8,y:7},
-          'Andhra Pradesh': {x:3,y:5},
-          'Arunachal Pradesh': {x:8,y:1},
-          'Assam': {x:7,y:2},
-          'Bihar': {x:5,y:2},
-          'Chandigarh': {x:2,y:1},
-          'Chhattisgarh': {x:3,y:3},
-          'Dadra and Nagar Haveli and Daman and Diu': {x:1,y:4},
-          'Delhi': {x:3,y:2},
-          'Goa': {x:2,y:5},
-          'Gujarat': {x:0,y:3},
-          'Haryana': {x:2,y:2},
-          'Himachal Pradesh': {x:3,y:1},
-          'Jammu and Kashmir': {x:2,y:0},
-          'Jharkhand': {x:5,y:3},
-          'Karnataka': {x:2,y:6},
-          'Kerala': {x:2,y:7},
-          'Ladakh': {x:3,y:0},
-          'Lakshadweep': {x:0,y:7},
-          'Madhya Pradesh': {x:2,y:3},
-          'Maharashtra': {x:2,y:4},
-          'Manipur': {x:8,y:3},
-          'Meghalaya': {x:7,y:3},
-          'Mizoram': {x:8,y:4},
-          'Nagaland': {x:8,y:2},
-          'Odisha': {x:4,y:3},
-          'Puducherry': {x:3,y:6},
-          'Punjab': {x:1,y:2},
-          'Rajasthan': {x:1,y:3},
-          'Sikkim': {x:6,y:1},
-          'Tamil Nadu': {x:3,y:7},
-          'Telangana': {x:3,y:4},
-          'Tripura': {x:7,y:4},
-          'Uttar Pradesh': {x:4,y:2},
-          'Uttarakhand': {x:4,y:1},
-          'West Bengal': {x:6,y:2},
+          'Andaman and Nicobar Islands': {x:8,y:7, abbr: 'AN'},
+          'Andhra Pradesh': {x:3,y:5, abbr: 'AP'},
+          'Arunachal Pradesh': {x:8,y:1, abbr: 'AR'},
+          'Assam': {x:7,y:2, abbr: 'AS'},
+          'Bihar': {x:5,y:2, abbr: 'BR'},
+          'Chandigarh': {x:2,y:1, abbr: 'CH'},
+          'Chhattisgarh': {x:3,y:3, abbr: 'CT'},
+          'Dadra and Nagar Haveli and Daman and Diu': {x:1,y:4, abbr: 'DNDD'},
+          'Delhi': {x:3,y:2, abbr: 'DL'},
+          'Goa': {x:2,y:5, abbr: 'GA'},
+          'Gujarat': {x:0,y:3, abbr: 'GJ'},
+          'Haryana': {x:2,y:2, abbr: 'HR'},
+          'Himachal Pradesh': {x:3,y:1, abbr: 'HP'},
+          'Jammu and Kashmir': {x:2,y:0, abbr: 'JK'},
+          'Jharkhand': {x:5,y:3, abbr: 'JH'},
+          'Karnataka': {x:2,y:6, abbr: 'KA'},
+          'Kerala': {x:2,y:7, abbr: 'KL'},
+          'Ladakh': {x:3,y:0, abbr: 'LA'},
+          'Lakshadweep': {x:0,y:7, abbr: 'LD'},
+          'Madhya Pradesh': {x:2,y:3, abbr: 'MP'},
+          'Maharashtra': {x:2,y:4, abbr: 'MH'},
+          'Manipur': {x:8,y:3, abbr: 'MN'},
+          'Meghalaya': {x:7,y:3, abbr: 'ML'},
+          'Mizoram': {x:8,y:4, abbr: 'MZ'},
+          'Nagaland': {x:8,y:2, abbr: 'NL'},
+          'Odisha': {x:4,y:3, abbr: 'OR'},
+          'Puducherry': {x:3,y:6, abbr: 'PY'},
+          'Punjab': {x:1,y:2, abbr: 'PB'},
+          'Rajasthan': {x:1,y:3, abbr: 'RJ'},
+          'Sikkim': {x:6,y:1, abbr: 'SK'},
+          'Tamil Nadu': {x:3,y:7, abbr: 'TN'},
+          'Telangana': {x:3,y:4, abbr: 'TG'},
+          'Tripura': {x:7,y:4, abbr: 'TR'},
+          'Uttar Pradesh': {x:4,y:2, abbr: 'UP'},
+          'Uttarakhand': {x:4,y:1, abbr: 'UT'},
+          'West Bengal': {x:6,y:2, abbr: 'WB'}
         }
       };
 
 
       // set the dimensions and margins of the graph
       var margin = {top: 30, right: 0, bottom: 0, left: 0},
-          width = 700 - margin.left - margin.right,
-          height = 700 - margin.top - margin.bottom;
+          width = 660,
+          height = 660;
+
+      d3.selectAll("svg").remove();
 
       var svg = d3.select("#map")
         .append("svg")
@@ -81,15 +90,23 @@ Vue.component('gridmap', {
           .style('stroke', 'black');
 
     svg.append("text")
-        .attr("class", "x label")
+        .attr("class", "title")
         .attr("text-anchor", "middle")
         .attr("x", width/2)
-        .attr("y", 1.2 * margin.top)
+        .attr("y", 1.25 * margin.top)
         .text("What Percentage of COVID Tests are Positive?")
         .style('fill', 'black')
         .style('stroke', 'none')
-        .style('font-size', '1.75rem')
+        .style('font-size', '1.25rem')
         .style("font-family", "serif");
+
+      var x = d3.scaleLinear()
+        .domain([-0.5, 8.5])
+        .range([ 0, width]);
+
+      var y = d3.scaleLinear()
+        .domain([-0.5, 8.5])
+        .range([ 0, height]);
 
       let statedata = this.statedata;
 
@@ -105,10 +122,10 @@ Vue.component('gridmap', {
 
         g2r.config = config;
         g2r.data = geojson;
-        g2r.svg = svg.append('g');
+        g2r.svg = svg.append('g')
+          .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
 
-        g2r.draw();
-        g2r.toggle();
         g2r.draw();
 
         colors.domain([0,0.35]);
@@ -117,6 +134,28 @@ Vue.component('gridmap', {
           d3.selectAll("svg .id-" + d.state.replaceAll(' ', '.'))
             .style("fill", colors(d.positivityrate));
         });
+
+        Object.keys(config.grid).forEach(function(d) {
+
+          let state = config.grid[d];
+
+          svg.append("text")
+              .attr("class", "label")
+              .attr("text-anchor", "middle")
+              .attr("x", x(state.x))
+              .attr("y", y(1 + state.y))
+              .text(state.abbr)
+              .style('font-size', '1.25rem')
+              .style('fill', 'black')
+              .style('stroke', 'none')
+              .style('visibility', 'hidden');
+          });
+
+        g2r.toggle();
+        setTimeout(function() {
+          d3.selectAll('.label').style('visibility', 'visible');          
+        }, 1000);
+        g2r.draw();
 
       });
 
@@ -171,7 +210,6 @@ Vue.component('chart', {
           width = 500 - margin.left - margin.right,
           height = 800 - margin.top - margin.bottom;
 
-      // append the svg object to the body of the page
       d3.selectAll("svg").remove();
 
       var svg = d3.select("#chart")
