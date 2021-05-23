@@ -2,7 +2,7 @@
 
 Vue.component('gridmap', {
   
-  props: [],
+  props: ['statedata'],
 
   template: '<div id="map"></div>',
 
@@ -12,25 +12,29 @@ Vue.component('gridmap', {
       var config = {
         width : 700,
         height : 700,
-        padding : 70,
+        padding : 30,
         projection : d3.geoMercator(),
         duration : 1000,
         key:function(d){return d.properties.st_nm; },
         grid : {
           'Andaman and Nicobar Islands': {x:8,y:7},
+          'Andhra Pradesh': {x:3,y:5},
           'Arunachal Pradesh': {x:8,y:1},
           'Assam': {x:7,y:2},
           'Bihar': {x:5,y:2},
           'Chandigarh': {x:2,y:1},
           'Chhattisgarh': {x:3,y:3},
           'Dadra and Nagar Haveli and Daman and Diu': {x:1,y:4},
+          'Delhi': {x:3,y:2},
           'Goa': {x:2,y:5},
           'Gujarat': {x:0,y:3},
           'Haryana': {x:2,y:2},
           'Himachal Pradesh': {x:3,y:1},
+          'Jammu and Kashmir': {x:2,y:0},
           'Jharkhand': {x:5,y:3},
           'Karnataka': {x:2,y:6},
           'Kerala': {x:2,y:7},
+          'Ladakh': {x:3,y:0},
           'Lakshadweep': {x:0,y:7},
           'Madhya Pradesh': {x:2,y:3},
           'Maharashtra': {x:2,y:4},
@@ -38,7 +42,7 @@ Vue.component('gridmap', {
           'Meghalaya': {x:7,y:3},
           'Mizoram': {x:8,y:4},
           'Nagaland': {x:8,y:2},
-          'Delhi': {x:3,y:2},
+          'Odisha': {x:4,y:3},
           'Puducherry': {x:3,y:6},
           'Punjab': {x:1,y:2},
           'Rajasthan': {x:1,y:3},
@@ -49,19 +53,19 @@ Vue.component('gridmap', {
           'Uttar Pradesh': {x:4,y:2},
           'Uttarakhand': {x:4,y:1},
           'West Bengal': {x:6,y:2},
-          'Odisha': {x:4,y:3},
-          'Andhra Pradesh': {x:3,y:5},
-          'Jammu and Kashmir': {x:2,y:0},
-          'Ladakh': {x:3,y:0}
         }
       };
 
       var svg = d3.select('#map').append('svg').attr('width',config.width).attr('height',config.height).style('fill','transparent').style('stroke', 'black');
+      let statedata = this.statedata;
+
+      // colour scale
+      var colors = d3.scaleQuantile()
+        .range(['#ffffe0','#ffd59b','#ffa474','#f47461','#db4551','#b81b34','#8b0000']);
 
       var g2r = new geo2rect.draw();
 
       d3.json('india.geojson', function(err, data){
-        console.log(data.features.map(e => e.properties.st_nm));
         var geojson = geo2rect.compute(data);
 
         g2r.config = config;
@@ -69,6 +73,14 @@ Vue.component('gridmap', {
         g2r.svg = svg.append('g');
 
         g2r.draw();
+
+        colors.domain([0,0.35]);
+
+        statedata.forEach(function(d) {
+          d3.selectAll("svg .id-" + d.state.replaceAll(' ', '.'))
+            .style("fill", colors(d.positivityrate));
+        });
+
       });
 
       d3.select('#map').append('a').text('Toggle').on('click', function(){
