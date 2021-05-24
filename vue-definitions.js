@@ -455,8 +455,6 @@ let app = new Vue({
   mounted() {
     d3.csv('https://raw.githubusercontent.com/aatishb/indiatestpositivitydata/main/statedata.csv', data => {
 
-      //this.lastUpdated = data.slice(-1)[0]['Date'];
-
       let [y, m, d] = data.slice(-1)[0]['Date'].split('-');
       this.lastUpdated = new Date(y,m - 1,d);
 
@@ -550,6 +548,7 @@ let app = new Vue({
     showtestnumbers: false,
     showtrend: true,
     showchange: false,
+    expand: false,
     selectedChart: 'positivityrate',
     options: [
       { text: 'Percentage of Positive Tests', value: 'positivityrate' },

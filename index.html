@@ -25,12 +25,18 @@
 
     <div class="container">
 
-      <h1>What Percentage of COVID-19 Tests are Positive in Indian States?</h1>
+      <h1 style="text-align: center;">What Percentage of COVID-19 Tests are Positive in Indian States?</h1>
 
       <p>Before reopening a region, the WHO recommends that <b>the percentage of COVID tests that are positive should be <a href="https://apps.who.int/iris/bitstream/handle/10665/332073/WHO-2019-nCoV-Adjusting_PH_measures-Criteria-2020.1-eng.pdf">less than 5 percent</a></b>. This means that out of 100 tests conducted, fewer than 5 should be positive on average.</p>
 
-      <div class="caveat">
-        ⚠️ <i>Be careful when interpreting COVID testing data, as this data leaves out people who haven't been tested or who don't have access to tests. This is particularly a problem in rural India where there is a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe testing shortage</a>.</i>
+      <div class="caveat" @click="expand = true">
+
+        <span v-if="expand">
+        ⚠️ <i>Be careful when interpreting COVID testing data, as this data leaves out people who haven't been tested or who don't have access to tests. This is particularly a problem in rural India where there is a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe testing shortage</a>. There are also differences in how states report numbers, and occasional errors in data collection. While testing data can be useful for revealing trends, <b>policy decisions about reopenings should not be based on COVID testing data alone</b> and should also take into account <a href="https://apps.who.int/iris/bitstream/handle/10665/332073/WHO-2019-nCoV-Adjusting_PH_measures-Criteria-2020.1-eng.pdf">other measures of community spread</a>.</i>
+        </span>
+        <span v-else>
+        ⚠️ <i>Be careful when interpreting COVID testing data, as it leaves out people who haven't been tested or who don't have access to tests. <b><a>Read more.</a></b></i> 
+        </span>
       </div>
 
       <div style="display: flex; flex-direction: row; justify-content: center;">
@@ -56,12 +62,12 @@
           </div>
         </div>
 
-        <h2>States <span style="color:#378b37;">that meet</span> WHO guidelines:  <span style="color:#378b37;">{{statesWithLowPositivity.length}}</span></h2>
+        <h2>States <span style="color:#378b37;">that meet</span> WHO guidelines<sup style="font-weight: 300;">*</sup>:  <span style="color:#378b37;">{{statesWithLowPositivity.length}}</span></h2>
 
         <statetable :statedata="statesWithLowPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
 
         <br>
-        <h2>States <span style="color:crimson;">that don't meet</span> WHO guidelines: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
+        <h2>States <span style="color:crimson;">that don't meet</span> WHO guidelines<sup style="font-weight: 300;">*</sup>: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
 
         <statetable :statedata="statesWithHighPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
 
@@ -99,7 +105,7 @@
 
       <p>This page was last updated on {{lastUpdated.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}) }}.</p>
 
-      <p>Data Source: <a href="https://api.covid19india.org/">Covid19India.org</a>. Data & methodology available on <a href="https://github.com/aatishb/indiatestpositivitydata">GitHub</a>.</p>
+      <p>Data Sources: <a href="https://api.covid19india.org/">Covid19India.org</a> (states) & <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a> (districts) <span style="font-weight: 700">&middot;</span> <a href="https://github.com/aatishb/indiatestpositivitydata">Data Archive</a> <span style="font-weight: 700">&middot;</span> <sup style="font-weight: 300;">*</sup><a href="https://github.com/aatishb/indiatesttracker">Methodology & Source Code</a></p>
 
     </div>
 
