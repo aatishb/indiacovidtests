@@ -7,8 +7,8 @@ Vue.component('gridmap', {
   template: `<div>
     <div id="blurb"></div>
     <div id="map"></div>
-    <div>
-      <button v-if="g2r !== null" @click="toggle" style="margin-bottom: 1rem;">Switch to {{g2r.mode == 'geo' ? 'Grid' : 'Map'}} View</button>
+    <div style="display: flex; flex-direction: row; justify-content: center;">
+      <button v-if="g2r !== null" @click="toggle" style="margin-bottom: 1rem;">Show {{g2r.mode == 'geo' ? 'Grid' : 'Map'}}</button>
     </div>
   </div>
   `,
