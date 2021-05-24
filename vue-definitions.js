@@ -5,18 +5,22 @@ Vue.component('gridmap', {
   props: ['statedata'],
 
   template: `<div>
+    <div id="blurb"></div>
+    <div id="map"></div>
     <div>
       <button v-if="g2r !== null" @click="toggle">Switch to {{g2r.mode == 'geo' ? 'Grid' : 'Map'}} View</button>
     </div>
-    <div id="map"></div>
   </div>
   `,
 
   methods: {
-    toggle() {
+    toggle() { // todo: debounce
         this.g2r.toggle();
         if (this.g2r.mode == 'geo') {
           d3.selectAll('.label').style('visibility', 'hidden');
+          setTimeout(function() {
+            d3.selectAll('.label').style('visibility', 'hidden');          
+          }, 1000);
         } else {
           setTimeout(function() {
             d3.selectAll('.label').style('visibility', 'visible');          
@@ -108,6 +112,39 @@ Vue.component('gridmap', {
         .domain([-0.5, 8.5])
         .range([ 0, height]);
 
+      // create a tooltip
+      var tooltip = d3.select("#blurb")
+        .append("div")
+        .attr("class", "tooltip")
+        .style('border','2px solid rgb(40, 20, 70)')
+        .style('color','rgb(40, 20, 70)')
+        .style('background-color','lightgoldenrodyellow')
+        .style("padding", "0.75rem")
+        .html("Hover/Click on State for More Information");
+
+      // Three function that change the tooltip when user hover / move / leave a cell
+      var mouseover = function(state) {
+        if (state) {
+          tooltip.html('<b>' + state.state + "</b><br>% Positive Tests: " + state.positivityratestring 
+            + '<br>Weekly Change: ' + state.changestring
+            + '<br>Weekly Tests (per 1K people): ' + state.weeklytestspercapitastring);
+        }
+      };
+
+/*
+      <tr v-for="(state,i) in sort(statedata,key)" :key="i">
+        <td>{{state.state}}</td>
+        <td>{{state.positivityratestring}}</td>
+        <td v-if="showtrend">
+          <span :style="{color: state.change > 0 ? 'crimson' : '#378b37'}" v-if="Math.round(Math.abs(100*state.change)) > 0">
+            <b>{{state.change > 0 ? '▲' : '▼'}}</b> {{state.changestring}}
+          </span>
+          <span v-else><span style="vertical-align: -0.25rem; super; font-size: 1.75rem;">≈</span> {{state.changestring}}</span>
+        </td>
+        <td v-if="showtestnumbers">{{state.weeklytestspercapitastring}}</td>
+      </tr>
+*/
+
       let statedata = this.statedata;
 
       // colour scale
@@ -132,12 +169,15 @@ Vue.component('gridmap', {
 
         statedata.forEach(function(d) {
           d3.selectAll("svg .id-" + d.state.replaceAll(' ', '.'))
-            .style("fill", colors(d.positivityrate));
+            .style("fill", colors(d.positivityrate))
+            .on("mouseover", () => mouseover(d))
+            .on("click", () => mouseover(d));
         });
 
         Object.keys(config.grid).forEach(function(d) {
 
           let state = config.grid[d];
+          let data = statedata.filter(e => e.state == d)[0];
 
           svg.append("text")
               .attr("class", "label")
@@ -148,7 +188,10 @@ Vue.component('gridmap', {
               .style('font-size', '1.25rem')
               .style('fill', 'black')
               .style('stroke', 'none')
-              .style('visibility', 'hidden');
+              .style('visibility', 'hidden')
+              .on("mouseover", () => mouseover(data))
+              .on("click", () => mouseover(data));
+
           });
 
         g2r.toggle();
@@ -386,14 +429,14 @@ Vue.component('statetable', {
       </tr>
       <tr v-for="(state,i) in sort(statedata,key)" :key="i">
         <td>{{state.state}}</td>
-        <td>{{(100 * state.positivityrate).toFixed(1) + '%'}}</td>
+        <td>{{state.positivityratestring}}</td>
         <td v-if="showtrend">
           <span :style="{color: state.change > 0 ? 'crimson' : '#378b37'}" v-if="Math.round(Math.abs(100*state.change)) > 0">
-            <b>{{state.change > 0 ? '▲' : '▼'}}</b> {{(100 * state.change).toFixed(1) + '%'}}
+            <b>{{state.change > 0 ? '▲' : '▼'}}</b> {{state.changestring}}
           </span>
-          <span v-else><span style="vertical-align: -0.25rem; super; font-size: 1.75rem;">≈</span> {{(100 * state.change).toFixed(1) + '%'}}</span>
+          <span v-else><span style="vertical-align: -0.25rem; super; font-size: 1.75rem;">≈</span> {{state.changestring}}</span>
         </td>
-        <td v-if="showtestnumbers">{{(1000 * state.weeklytestspercapita).toFixed(1)}}</td>
+        <td v-if="showtestnumbers">{{state.weeklytestspercapitastring}}</td>
       </tr>
     </table> 
   </div>`,
@@ -441,9 +484,12 @@ let app = new Vue({
           recentData.push({
             state: state,
             positivityrate: recentTPR,
+            positivityratestring: (100 * recentTPR).toFixed(1) + '%',
             pastpositivityrate: pastTPR,
             change: recentTPR - pastTPR,
-            weeklytestspercapita: weeklytestspercapita
+            changestring: (100 * (recentTPR - pastTPR)).toFixed(1) + '%',            
+            weeklytestspercapita: weeklytestspercapita,
+            weeklytestspercapitastring: (1000 * weeklytestspercapita).toFixed(1)
           });          
 
         }
