@@ -121,12 +121,17 @@ Vue.component('gridmap', {
         .style('background-color','lightgoldenrodyellow')
         .style("padding", "0.75rem")
         .style("margin-top", "1rem")
+        .style("max-height", "5rem")
+        .style('transition', 'max-height 0.2s ease-in')
+        .style('-webkit-transition', 'max-height 0.2s ease-in')
+        .style('-moz-transition', 'max-height 0.2s ease-in')
+        .style('overflow', 'hidden')
         .html("👉🏽 Hover/Click on State for More Information");
 
       // Three function that change the tooltip when user hover / move / leave a cell
       var mouseover = function(state) {
         if (state) {
-          tooltip.html('<b>' + state.state + "</b><br>% Positive Tests: <b>" + state.positivityratestring 
+          tooltip.style("max-height", "15rem").html('<b>' + state.state + "</b><br>% Positive Tests: <b>" + state.positivityratestring 
             + '</b><br>Weekly Change: <b>' + state.changestring
             + '</b><br>Weekly Tests (per 1K people): <b>' + state.weeklytestspercapitastring) + '</b>';
         }
