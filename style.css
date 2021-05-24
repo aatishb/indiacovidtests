@@ -16,12 +16,6 @@ th, td {
   text-align: left;
 }
 
-.center {
-  width: 60%;
-  margin: 0 auto;
-  padding: 0 0 10px 0;
-}
-
 .graph {
   height: 400px;
   display: block;
@@ -55,27 +49,65 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-.light {
-  font-weight: 300;
-  color: rgb(40, 20, 70);
-}
-
-img {
-  max-width:100%;
-}
-
-.intro {
-   margin-bottom: 24px;
-   font-size: 1.5rem;
+.caveat {
+  border: 2px solid rgb(40, 20, 70);
+  padding: 0.75rem;
+  background-color: lightgoldenrodyellow;
+  font-weight: 500;
+  margin-bottom: 1rem;
 }
 
 p {
-   margin-bottom:20px;
+   margin-bottom:1rem;
+}
+
+.container > p:last-child {
+  margin-bottom: 0;
 }
 
 p:last-child {
-  margin-bottom:none;
+  margin-bottom: 0;
 }
+
+
+button {
+  font-size: 1rem;
+  font-weight: 100;
+
+  text-align: center;
+  text-decoration: none;
+
+  transition-duration: 0.4s;
+
+  background-color: rgb(85, 56, 100);
+  color: rgb(254, 199, 81);
+  border: 0.125rem solid rgb(85, 56, 100);
+  border-radius: 0.25rem;
+
+  margin: 0rem;
+}
+
+button:hover {
+  background-color: rgb(69,10,76);
+  border: 0.125rem solid rgb(69,10,76);
+  color: rgb(254, 199, 81);
+}
+
+select { /* modified from https://stackoverflow.com/a/57510283 */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 17.5rem;
+  font-size: 1rem;
+  appearance: none;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50' fill='%23FEC751'><polygon points='0,0 100,0 50,50'/></svg>") no-repeat;
+  background-size: 12px;
+  background-position: calc(100% - 10px) center;
+  background-repeat: no-repeat;
+  background-color: rgb(85, 56, 100);
+  color: rgb(255, 190, 137);
+}
+
+
 
 h1 {
   padding-top:20px;
@@ -119,17 +151,6 @@ b {
 
 a {
   color: dodgerblue;
-}
-
-blockquote {
-
- font-size: 1.2rem;
- font-style: italic;
- margin-bottom: 20px;
- padding-left: 15px;
-
- border-width: 0px 0px 0px 3px;
- border-style: solid;
 }
 
 

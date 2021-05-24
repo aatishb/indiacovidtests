@@ -28,11 +28,11 @@
 
       <p>Before reopening a region, the WHO recommends that <b>the percentage of COVID tests that are positive should be <a href="https://apps.who.int/iris/bitstream/handle/10665/332073/WHO-2019-nCoV-Adjusting_PH_measures-Criteria-2020.1-eng.pdf">less than 5 percent</a></b>. This means that out of 100 tests conducted, fewer than 5 should be positive on average.</p>
 
-      <div>
-        <p style="border: 2px solid rgb(40, 20, 70); padding: 0.75rem; background-color: lightgoldenrodyellow; font-weight: 500;">⚠️ <i>Be careful when interpreting this data, as it leaves out people who haven't been tested for COVID or who don't have access to COVID tests. This is particularly a problem in rural India where there is a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe testing shortage</a>.</i></p>
+      <div class="caveat">
+        ⚠️ <i>Be careful when interpreting this data, as it leaves out people who haven't been tested for COVID or who don't have access to COVID tests. This is particularly a problem in rural India where there is a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe testing shortage</a>.</i>
       </div>
 
-      <div style="margin-bottom: 1rem;">
+      <div>
         <button @click="viewMode = 'table'">Table View</button>
         <button @click="viewMode = 'chart'">Chart View</button>
         <button @click="viewMode = 'map'">Map View</button>
@@ -68,7 +68,6 @@
 
       <div class="container">
         <div>
-          Show 
           <select v-model="selectedChart">
             <option v-for="option in options" v-bind:value="option.value">
               {{ option.text }}
@@ -87,6 +86,7 @@
 
     <div v-if="viewMode == 'map'" class="container">
       <gridmap :statedata="recentData"></gridmap>
+      <p>The numbers in this chart represent a 1 week average.</p>
     </div>
 
     <div class="container">

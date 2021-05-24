@@ -8,7 +8,7 @@ Vue.component('gridmap', {
     <div id="blurb"></div>
     <div id="map"></div>
     <div>
-      <button v-if="g2r !== null" @click="toggle">Switch to {{g2r.mode == 'geo' ? 'Grid' : 'Map'}} View</button>
+      <button v-if="g2r !== null" @click="toggle" style="margin-bottom: 1rem;">Switch to {{g2r.mode == 'geo' ? 'Grid' : 'Map'}} View</button>
     </div>
   </div>
   `,
@@ -120,30 +120,16 @@ Vue.component('gridmap', {
         .style('color','rgb(40, 20, 70)')
         .style('background-color','lightgoldenrodyellow')
         .style("padding", "0.75rem")
-        .html("Hover/Click on State for More Information");
+        .html("👉🏽 Hover/Click on State for More Information");
 
       // Three function that change the tooltip when user hover / move / leave a cell
       var mouseover = function(state) {
         if (state) {
-          tooltip.html('<b>' + state.state + "</b><br>% Positive Tests: " + state.positivityratestring 
-            + '<br>Weekly Change: ' + state.changestring
-            + '<br>Weekly Tests (per 1K people): ' + state.weeklytestspercapitastring);
+          tooltip.html('<b>' + state.state + "</b><br>% Positive Tests: <b>" + state.positivityratestring 
+            + '</b><br>Weekly Change: <b>' + state.changestring
+            + '</b><br>Weekly Tests (per 1K people): <b>' + state.weeklytestspercapitastring) + '</b>';
         }
       };
-
-/*
-      <tr v-for="(state,i) in sort(statedata,key)" :key="i">
-        <td>{{state.state}}</td>
-        <td>{{state.positivityratestring}}</td>
-        <td v-if="showtrend">
-          <span :style="{color: state.change > 0 ? 'crimson' : '#378b37'}" v-if="Math.round(Math.abs(100*state.change)) > 0">
-            <b>{{state.change > 0 ? '▲' : '▼'}}</b> {{state.changestring}}
-          </span>
-          <span v-else><span style="vertical-align: -0.25rem; super; font-size: 1.75rem;">≈</span> {{state.changestring}}</span>
-        </td>
-        <td v-if="showtestnumbers">{{state.weeklytestspercapitastring}}</td>
-      </tr>
-*/
 
       let statedata = this.statedata;
 
@@ -487,7 +473,7 @@ let app = new Vue({
             positivityratestring: (100 * recentTPR).toFixed(1) + '%',
             pastpositivityrate: pastTPR,
             change: recentTPR - pastTPR,
-            changestring: (100 * (recentTPR - pastTPR)).toFixed(1) + '%',            
+            changestring: ((100 * (recentTPR - pastTPR)).toFixed(1) + '%').replace('-','−'), //long minus sign            
             weeklytestspercapita: weeklytestspercapita,
             weeklytestspercapitastring: (1000 * weeklytestspercapita).toFixed(1)
           });          
