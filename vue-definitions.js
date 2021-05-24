@@ -409,12 +409,12 @@ Vue.component('statetable', {
   template: `<div>
     <table>
       <tr>
-        <th class="columntitle" @click="key = 'state'"><b>State or Union Territory</b></th>
-        <th class="columntitle" @click="key = 'positivityrate'"><b>% Positive Tests</b> <br><span class="light">(1 week average)</span></th>
-        <th v-if="showtrend" class="columntitle" @click="key = 'change'"><b>Trend</b> <br><span class="light">(1 week change)</span></th>
-        <th v-if="showtestnumbers" class="columntitle" @click="key = 'weeklytestspercapita'"><b>Weekly Tests</b> <br><span class="light">(per 1,000 people)</span></th>
+        <th class="columntitle" @click="changekey('state')"><b>State or Union Territory</b> <span v-if="key == 'state'">{{(sortorder[key]) ? '▼' : '▲'}}</span></th>
+        <th class="columntitle" @click="changekey('positivityrate')"><b>% Positive Tests</b> <span v-if="key == 'positivityrate'">{{(sortorder[key]) ? '▼' : '▲'}}</span> <br><span class="light">(1 week average)</span></th>
+        <th v-if="showtrend" class="columntitle" @click="changekey('change')"><b>Trend</b> <span v-if="key == 'change'">{{(sortorder[key]) ? '▼' : '▲'}}</span> <br><span class="light">(1 week change)</span></th>
+        <th v-if="showtestnumbers" class="columntitle" @click="changekey('weeklytestspercapita')"><b>Weekly Tests</b> <span v-if="key == 'weeklytestspercapita'">{{(sortorder[key]) ? '▼' : '▲'}}</span><br><span class="light">(per 1,000 people)</span></th>
       </tr>
-      <tr v-for="(state,i) in sort(statedata,key)" :key="i">
+      <tr v-for="(state,i) in sort(statedata, key)" :key="i">
         <td>{{state.state}}</td>
         <td>{{state.positivityratestring}}</td>
         <td v-if="showtrend">
@@ -429,11 +429,22 @@ Vue.component('statetable', {
   </div>`,
 
   methods: {
+    changekey(key) {
+      this.key = key;
+      this.sortorder[key] = !this.sortorder[key];
+      // restore other column sort to default
+      for (let k of Object.keys(this.sortorder)) {
+        if (k !== key) {
+          this.sortorder[k] = false;
+        }
+      }
+    },
+
     sort(data, key) {
       if(key == 'state') {
-        return this.statedata.sort((a,b) => a[key] > b[key] ? 1 : -1);
+        return this.sortorder[key] ? this.statedata.sort((a,b) => a[key] > b[key] ? 1 : -1) : this.statedata.sort((a,b) => a[key] > b[key] ? 1 : -1).reverse();
       } else {
-        return this.statedata.sort((a,b) => parseFloat(b[key]) - parseFloat(a[key]));        
+        return this.sortorder[key] ? this.statedata.sort((a,b) => parseFloat(b[key]) - parseFloat(a[key])) : this.statedata.sort((a,b) => parseFloat(b[key]) - parseFloat(a[key])).reverse();        
       }
     }
 
@@ -441,7 +452,13 @@ Vue.component('statetable', {
 
   data() {
     return {
-      key: 'positivityrate'
+      key: 'positivityrate',
+      sortorder: {
+        'state': false,
+        'positivityrate': true,
+        'change': false,
+        'weeklytestspercapita': false,        
+      }
     };
   },
 
