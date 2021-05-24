@@ -24,38 +24,43 @@
   <div id="root">
 
     <div class="container">
-      <h2>What Percentage of COVID Tests are Positive in Indian States?</h2>
+
+      <h1>What Percentage of COVID-19 Tests are Positive in Indian States?</h1>
 
       <p>Before reopening a region, the WHO recommends that <b>the percentage of COVID tests that are positive should be <a href="https://apps.who.int/iris/bitstream/handle/10665/332073/WHO-2019-nCoV-Adjusting_PH_measures-Criteria-2020.1-eng.pdf">less than 5 percent</a></b>. This means that out of 100 tests conducted, fewer than 5 should be positive on average.</p>
 
       <div class="caveat">
-        ⚠️ <i>Be careful when interpreting this data, as it leaves out people who haven't been tested for COVID or who don't have access to COVID tests. This is particularly a problem in rural India where there is a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe testing shortage</a>.</i>
+        ⚠️ <i>Be careful when interpreting COVID testing data, as this data leaves out people who haven't been tested or who don't have access to tests. This is particularly a problem in rural India where there is a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe testing shortage</a>.</i>
       </div>
 
-      <div>
+      <div style="display: flex; flex-direction: row; justify-content: center;">
         <button @click="viewMode = 'table'">Table View</button>
         <button @click="viewMode = 'chart'">Chart View</button>
         <button @click="viewMode = 'map'">Map View</button>
       </div>
+
     </div>
 
     <div v-if="viewMode == 'table'">
       <div class="container">
-        <div>
-          <input type="checkbox" id="showtrend" v-model="showtrend">
-          <label for="showtrend">Show Trend</label>      
+
+        <div style="padding-top:0.5rem; padding-bottom:0.5rem;">
+          <div>
+            <input type="checkbox" id="showtrend" v-model="showtrend">
+            <label for="showtrend">Show Trend</label>      
+          </div>
+
+          <div>
+            <input type="checkbox" id="showtestnumbers" v-model="showtestnumbers">
+            <label for="showtestnumbers">Show Number of Tests</label>      
+          </div>
         </div>
 
-        <div>
-          <input type="checkbox" id="showtestnumbers" v-model="showtestnumbers">
-          <label for="showtestnumbers">Show Number of Tests</label>      
-        </div>
-
-        <h2>States <span style="color:#378b37;">meeting</span> WHO standards:  <span style="color:#378b37;">{{statesWithLowPositivity.length}}</span></h2>
+        <h2>States <span style="color:#378b37;">that meet</span> WHO guidelines:  <span style="color:#378b37;">{{statesWithLowPositivity.length}}</span></h2>
 
         <statetable :statedata="statesWithLowPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
 
-        <h2>States <span style="color:crimson;">not meeting</span> WHO standards: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
+        <h2>States <span style="color:crimson;">that don't meet</span> WHO guidelines: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
 
         <statetable :statedata="statesWithHighPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
 
@@ -67,7 +72,7 @@
     <div v-if="viewMode == 'chart'">
 
       <div class="container">
-        <div>
+        <div style="display: flex; flex-direction: row; justify-content: center;">
           <select v-model="selectedChart">
             <option v-for="option in options" v-bind:value="option.value">
               {{ option.text }}

@@ -120,6 +120,7 @@ Vue.component('gridmap', {
         .style('color','rgb(40, 20, 70)')
         .style('background-color','lightgoldenrodyellow')
         .style("padding", "0.75rem")
+        .style("margin-top", "1rem")
         .html("👉🏽 Hover/Click on State for More Information");
 
       // Three function that change the tooltip when user hover / move / leave a cell
