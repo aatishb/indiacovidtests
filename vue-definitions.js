@@ -798,6 +798,8 @@ const State = {
       <graph :data="stateTimeSeries" metric="Weekly Tests" :title="'Weekly COVID Tests in ' + state" stroke="black" fill="rgba(0,255,0,0.2)"></graph>
       <br>
       <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'% Positive Tests in ' + state + ' (7 day average)'" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
+      <br>
+      <p>To calculate the <b>Percentage of Positive Tests</b> (third graph), we divide the <b>Weekly Cases</b> (first graph) by the <b>Weekly Tests</b> (second graph).</p>
 
     </div>
 
