@@ -17,34 +17,14 @@
 </head>
 <body>
 
-  <header>
-    <div><a href="https://aatishb.com/indiatesttracker/"><span style="letter-spacing: -6.5px;">▲</span>▼ India Test Tracker</a></div>
-    <div><a href="https://github.com/aatishb/indiatesttracker#readme">About</a></div>
-  </header>
-
   <div id="root">
 
-    <div class="container">
+    <header>
+      <div><router-link to="/"><span style="letter-spacing: -6.5px;">▲</span>▼ India Test Tracker</router-link></div>
+      <div><a href="https://github.com/aatishb/indiatesttracker#readme">About</a></div>
+    </header>
 
-      <router-link to="/">Go to Main</router-link>
-
-      <h1 style="text-align: center;">What Percentage of COVID-19 Tests are Positive in Indian States?</h1>
-
-      <p>Before reopening a region, the WHO recommends that <b>the percentage of COVID tests that are positive should be <a href="https://apps.who.int/iris/handle/10665/332073">less than 5 percent</a></b>. This means that out of 100 tests conducted, fewer than 5 should be positive on average.</p>
-
-      <div class="caveat" @click="expand = true" :style="{'max-height': expand ? '33rem' : '9rem'}">
-
-        <span v-if="expand">
-        ⚠️ <i>Be careful when interpreting COVID testing data, as this data leaves out people who haven't been tested or who don't have access to tests. This is particularly a problem in rural India where there is a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe testing shortage</a>. There are also differences in how states report numbers, and occasional errors in data collection. While testing data can be useful for revealing trends, <b>policy decisions about reopenings should not be based on COVID testing data alone</b> and should take into account <a href="https://apps.who.int/iris/handle/10665/332073">other measures of community spread</a>.</i>
-        </span>
-        <span v-else>
-        ⚠️ <i>Be careful when interpreting COVID testing data, as it leaves out people who haven't been tested or who don't have access to tests. <b><a>Read more.</a></b></i> 
-        </span>
-      </div>
-
-    </div>
-
-    <router-view :recent-data="recentData"></router-view>
+    <router-view :recent-data="recentData" :all-data="allData" :abbreviations="abbreviations"></router-view>
 
     <footer>
       <div class="container">
