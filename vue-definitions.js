@@ -837,6 +837,9 @@ const routes = [
 const router = new VueRouter({
   mode: 'history',
   base: '/indiatesttracker/',
+  scrollBehavior (to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  },
   routes: routes // short for `routes: routes`
 });
 
