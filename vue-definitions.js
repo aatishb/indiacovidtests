@@ -421,7 +421,7 @@ Vue.component('statetable', {
         <th v-if="showtestnumbers" class="columntitle" @click="changekey('weeklytestspercapita')"><b>Weekly Tests</b> <span v-if="key == 'weeklytestspercapita'">{{(sortorder[key]) ? '▼' : '▲'}}</span><br><span class="light">(per 1,000 people)</span></th>
       </tr>
       <tr v-for="(state,i) in sort(statedata, key)" :key="i">
-        <td>{{state.state}}</td>
+        <td><router-link :to="'/state/'+state.abbreviation">{{state.state}}</router-link></td>
         <td>{{state.positivityratestring}}</td>
         <td v-if="showtrend">
           <span :style="{color: state.change > 0 ? 'crimson' : 'rgb(70, 130, 65)'}" v-if="Math.round(Math.abs(100*state.change)) > 0">
@@ -470,10 +470,134 @@ Vue.component('statetable', {
 
 });
 
+
+
+// 0. If using a module system (e.g. via vue-cli), import Vue and VueRouter
+// and then call `Vue.use(VueRouter)`.
+
+// 1. Define route components.
+// These can be imported from other files
+const Main = {
+  props: ['recentData'],
+
+  template: `
+  <div>
+    <div class="container">
+      <div style="display: flex; flex-direction: row; justify-content: center;">
+        <button @click="viewMode = 'table'">Table View</button>
+        <button @click="viewMode = 'chart'">Chart View</button>
+        <button @click="viewMode = 'map'">Map View</button>
+      </div>
+    </div>
+
+    <div v-if="viewMode == 'table'">
+      <div class="container">
+
+        <div style="padding-top:0.5rem; padding-bottom:0.5rem;">
+          <div>
+            <input type="checkbox" id="showtrend" v-model="showtrend">
+            <label for="showtrend">Show Trend</label>      
+          </div>
+
+          <div>
+            <input type="checkbox" id="showtestnumbers" v-model="showtestnumbers">
+            <label for="showtestnumbers">Show Number of Tests</label>      
+          </div>
+        </div>
+
+        <h2>States <span style="color:rgb(18,136,18);">that meet</span> WHO guidelines<sup style="font-weight: 300;"><a href="#methodology" style="color: rgb(40, 20, 70); text-decoration: none;">*</a></sup>:  <span style="color:rgb(18,136,18);">{{statesWithLowPositivity.length}}</span></h2>
+
+        <statetable :statedata="statesWithLowPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
+
+        <br>
+        <h2>States <span style="color:crimson;">that don't meet</span> WHO guidelines<sup style="font-weight: 300;"><a href="#methodology" style="color: rgb(40, 20, 70); text-decoration: none;">*</a></sup>: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
+
+        <statetable :statedata="statesWithHighPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
+
+      </div>
+      <br>
+    </div>
+
+    <div v-else-if="viewMode == 'chart'">
+
+      <div class="container">
+        <div style="display: flex; flex-direction: row; justify-content: center;">
+          <select v-model="selectedChart">
+            <option v-for="option in options" v-bind:value="option.value">
+              {{ option.text }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <chart :statedata="recentData" :selected="selectedChart" class="fullwidth"></chart>
+
+      <div class="container">
+        <p>The numbers in this chart represent a 1 week average. The shaded green region denotes the WHO testing guideline for reopening. <span v-if="showchange">The dark circles indicate current values and light circles indicate values one week ago.</span></p>
+      </div>
+
+    </div>
+
+    <div v-else-if="viewMode == 'map'" class="container">
+      <gridmap :statedata="recentData"></gridmap>
+      <p>The numbers in this chart represent a 1 week average.</p>
+    </div>
+  </div>
+  `,
+
+  computed: {
+    statesWithHighPositivity() {
+      return this.recentData.filter(e => e.positivityrate >= 0.05);
+    },
+
+    statesWithLowPositivity() {
+      return this.recentData.filter(e => e.positivityrate < 0.05);
+    },
+
+  },
+
+  data() {
+    return {
+      viewMode: 'table',
+      showtestnumbers: false,
+      showtrend: true,
+      showchange: false,
+      selectedChart: 'positivityrate',
+      options: [
+        { text: 'Percentage of Positive Tests', value: 'positivityrate' },
+        { text: 'Trend (1 week change)', value: 'change' },
+        { text: 'Weekly Tests (per 1,000 people)', value: 'weeklytestspercapita' }
+      ]
+    };
+  }
+};
+
+const State = { template: '<div>Selected State: {{$route.params.id}}</div>' };
+
+// 2. Define some routes
+// Each route should map to a component. The "component" can
+// either be an actual component constructor created via
+// `Vue.extend()`, or just a component options object.
+// We'll talk about nested routes later.
+const routes = [
+  { path: '/', component: Main },
+  { path: '/state/:id', component: State },
+];
+
+// 3. Create the router instance and pass the `routes` option
+// You can pass in additional options here, but let's
+// keep it simple for now.
+const router = new VueRouter({
+  mode: 'history',
+  routes: routes // short for `routes: routes`
+});
+
 // global data
 let app = new Vue({
 
   el: '#root',
+
+  router: router,
 
   mounted() {
     d3.csv('https://raw.githubusercontent.com/aatishb/indiatestpositivitydata/main/statedata.csv', data => {
@@ -491,6 +615,7 @@ let app = new Vue({
           let weeklytestspercapita = stateData.slice(-1)[0]['Weekly Tests'] / this.population[state];
           recentData.push({
             state: state,
+            abbreviation: this.abbreviations[state],
             positivityrate: recentTPR,
             positivityratestring: (100 * recentTPR).toFixed(1) + '%',
             pastpositivityrate: pastTPR,
@@ -513,19 +638,7 @@ let app = new Vue({
   methods: {
   },
 
-  computed: {
-    statesWithHighPositivity() {
-      return this.recentData.filter(e => e.positivityrate >= 0.05);
-    },
-
-    statesWithLowPositivity() {
-      return this.recentData.filter(e => e.positivityrate < 0.05);
-    },
-
-  },
-
   data: {
-    viewMode: 'table',
     states: ['Andaman and Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhattisgarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir', 'Jharkhand', 'Karnataka', 'Kerala', 'Ladakh', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'],
     population: {
       'Andaman and Nicobar Islands': 380581,
@@ -565,21 +678,48 @@ let app = new Vue({
       'Uttarakhand': 10086292,
       'West Bengal': 91276115      
     },
+    abbreviations : {
+      'Andaman and Nicobar Islands': 'AN',
+      'Andhra Pradesh': 'AP',
+      'Arunachal Pradesh': 'AR',
+      'Assam':'AS',
+      'Bihar': 'BR',
+      'Chandigarh': 'CH',
+      'Chhattisgarh': 'CT',
+      'Dadra and Nagar Haveli and Daman and Diu': 'DNDD',
+      'Delhi': 'DL',
+      'Goa': 'GA',
+      'Gujarat': 'GJ',
+      'Haryana': 'HR',
+      'Himachal Pradesh': 'HP',
+      'Jammu and Kashmir': 'JK',
+      'Jharkhand': 'JH',
+      'Karnataka': 'KA',
+      'Kerala': 'KL',
+      'Ladakh': 'LA',
+      'Lakshadweep': 'LD',
+      'Madhya Pradesh': 'MP',
+      'Maharashtra': 'MH',
+      'Manipur': 'MN',
+      'Meghalaya': 'ML',
+      'Mizoram': 'MZ',
+      'Nagaland': 'NL',
+      'Odisha': 'OR',
+      'Puducherry': 'PY',
+      'Punjab': 'PB',
+      'Rajasthan': 'RJ',
+      'Sikkim': 'SK',
+      'Tamil Nadu': 'TN',
+      'Telangana': 'TG',
+      'Tripura': 'TR',
+      'Uttar Pradesh': 'UP',
+      'Uttarakhand': 'UT',
+      'West Bengal': 'WB'
+    },
     allData: [],
     recentData: [],
     lastUpdated: new Date(),
-    showtestnumbers: false,
-    showtrend: true,
-    showchange: false,
     expand: false,
-    selectedChart: 'positivityrate',
-    options: [
-      { text: 'Percentage of Positive Tests', value: 'positivityrate' },
-      { text: 'Trend (1 week change)', value: 'change' },
-      { text: 'Weekly Tests (per 1,000 people)', value: 'weeklytestspercapita' }
-    ]
-
-
   }
 
 });
