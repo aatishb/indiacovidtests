@@ -421,7 +421,7 @@ Vue.component('statetable', {
         <th v-if="showtestnumbers" class="columntitle" @click="changekey('weeklytestspercapita')"><b>Weekly Tests</b> <span v-if="key == 'weeklytestspercapita'">{{(sortorder[key]) ? '▼' : '▲'}}</span><br><span class="light">(per 1,000 people)</span></th>
       </tr>
       <tr v-for="(state,i) in sort(statedata, key)" :key="i">
-        <td><router-link :to="'/'+state.abbreviation">{{state.state}}</router-link></td>
+        <td><router-link :to="state.abbreviation">{{state.state}}</router-link></td>
         <td>{{state.positivityratestring}}</td>
         <td v-if="showtrend">
           <span :style="{color: state.change > 0 ? 'crimson' : 'rgb(70, 130, 65)'}" v-if="Math.round(Math.abs(100*state.change)) > 0">
