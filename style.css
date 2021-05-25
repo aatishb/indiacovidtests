@@ -49,8 +49,6 @@ body {
   font-weight: 400;
   color: rgb(0, 0, 51);
   background-color: rgb(254,252,242);
-  /* anti-aliasing for crisper fonts */
-  -webkit-font-smoothing: subpixel-antialiased;
   text-rendering: optimizeLegibility;
 }
 
@@ -63,7 +61,7 @@ footer {
 }
 
 footer a {
-  color: #64d8ff; 
+  color: #00bfff; 
 }
 
 .caveat {
