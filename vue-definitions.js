@@ -178,7 +178,7 @@ Vue.component('gridmap', {
               .attr("y", y(1 + state.y))
               .text(state.abbr)
               .style('font-size', '1.25rem')
-              .style('fill', 'rgb(0,0,51)')
+              .style('fill', data ? (data.positivityrate <= 0.3 ? 'black' : 'white') : 'black')
               .style('stroke', 'none')
               .style('visibility', 'hidden')
               .on("mouseover", () => mouseover(data))
