@@ -91,7 +91,7 @@ Vue.component('gridmap', {
         .append("svg")
           .attr("viewBox", '0 0 ' + String(width + margin.left + margin.right) + ' ' + String(height + margin.top + margin.bottom))
           .style('fill','transparent')
-          .style('stroke', 'black');
+          .style('stroke', 'rgb(0,0,51)');
 
     svg.append("text")
         .attr("class", "title")
@@ -99,7 +99,7 @@ Vue.component('gridmap', {
         .attr("x", width/2)
         .attr("y", 1.25 * margin.top)
         .text("What Percentage of COVID Tests are Positive?")
-        .style('fill', 'black')
+        .style('fill', 'rgb(0,0,51)')
         .style('stroke', 'none')
         .style('font-size', '1.25rem')
         .style("font-family", "serif");
@@ -178,7 +178,7 @@ Vue.component('gridmap', {
               .attr("y", y(1 + state.y))
               .text(state.abbr)
               .style('font-size', '1.25rem')
-              .style('fill', 'black')
+              .style('fill', 'rgb(0,0,51)')
               .style('stroke', 'none')
               .style('visibility', 'hidden')
               .on("mouseover", () => mouseover(data))
@@ -292,7 +292,8 @@ Vue.component('chart', {
         .attr("x", width/2)
         .attr("y", -30)
         .text(this.selected == 'weeklytestspercapita' ? "Number of Weekly Tests (per 1,000 people)" : "What Percentage of COVID Tests are Positive?")
-        .style("font-family", "serif");
+        .style("font-family", "serif")
+        .style("color", "rgb(0,0,51)");
 
       if (this.selected == 'change') {
 
@@ -325,7 +326,7 @@ Vue.component('chart', {
             .attr("cx", function(d) { return x(d.positivityrate); })
             .attr("cy", function(d) { return y(d.state); })
             .attr("r", "6")
-            .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : '#378b37'; })
+            .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : 'rgb(18,136,18)'; });
 
       } else if (this.selected == 'positivityrate') {
 
@@ -348,7 +349,7 @@ Vue.component('chart', {
             .attr("cx", x(0))
             .attr("cy", function(d) { return y(d.state); })
             .attr("r", "6")
-            .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : '#378b37'; })
+            .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : 'rgb(18,136,18)'; });
 
 
         // Change the X coordinates of line and circle
@@ -381,7 +382,7 @@ Vue.component('chart', {
             .attr("cx", x(0))
             .attr("cy", function(d) { return y(d.state); })
             .attr("r", "6")
-            .style("fill", function(d) { return 1000 * d.weeklytestspercapita < 10 ? 'crimson' : '#378b37'; })
+            .style("fill", function(d) { return 1000 * d.weeklytestspercapita < 10 ? 'crimson' : 'rgb(18,136,18)'; });
 
 
         // Change the X coordinates of line and circle
@@ -423,7 +424,7 @@ Vue.component('statetable', {
         <td>{{state.state}}</td>
         <td>{{state.positivityratestring}}</td>
         <td v-if="showtrend">
-          <span :style="{color: state.change > 0 ? 'crimson' : '#378b37'}" v-if="Math.round(Math.abs(100*state.change)) > 0">
+          <span :style="{color: state.change > 0 ? 'crimson' : 'rgb(70, 130, 65)'}" v-if="Math.round(Math.abs(100*state.change)) > 0">
             <b>{{state.change > 0 ? '▲' : '▼'}}</b> {{state.changestring}}
           </span>
           <span v-else><span style="vertical-align: -0.25rem; super; font-size: 1.75rem;">≈</span> {{state.changestring}}</span>

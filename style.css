@@ -26,14 +26,15 @@ header {
   padding-right: 0.25rem;
   font-size: 0.9rem;
   font-weight: 400;
-  color: rgb(40, 20, 70);
+  background-color: rgb(85, 56, 100);
+  color: rgb(255, 190, 137);
   display: flex;
   justify-content: space-between;
   font-family: 'Raleway', sans-serif;
 }
 
 header a {
-  color: rgb(40, 20, 70);
+  color: white;
   text-decoration: none;
 }
 
@@ -46,15 +47,27 @@ body {
   font-size:1rem;
   line-height: 1.5rem;
   font-weight: 400;
-  color: rgb(40, 20, 70);
+  color: rgb(0, 0, 51);
   background-color: rgb(254,252,242);
   /* anti-aliasing for crisper fonts */
   -webkit-font-smoothing: subpixel-antialiased;
   text-rendering: optimizeLegibility;
 }
 
+footer {
+  background-color: rgb(85, 56, 100);
+  color: white;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  font-weight: 400;
+}
+
+footer a {
+  color: #64d8ff; 
+}
+
 .caveat {
-  border: 2px solid rgb(40, 20, 70);
+  border: 2px solid rgb(0, 0, 51);
   padding: 0.75rem;
   background-color: lightgoldenrodyellow;
   font-weight: 500;
@@ -74,7 +87,7 @@ p {
 
 button {
   font-size: 1rem;
-  font-weight: 100;
+  font-weight: 200;
 
   text-align: center;
   text-decoration: none;
@@ -82,7 +95,7 @@ button {
   transition-duration: 0.4s;
 
   background-color: rgb(85, 56, 100);
-  color: rgb(254, 199, 81);
+  color: white;
   border: 0.125rem solid rgb(85, 56, 100);
   border-radius: 0.25rem;
 
@@ -93,7 +106,7 @@ button {
 button:hover {
   background-color: rgb(69,10,76);
   border: 0.125rem solid rgb(69,10,76);
-  color: rgb(254, 199, 81);
+  color: white;
 }
 
 select { /* modified from https://stackoverflow.com/a/57510283 */
@@ -101,14 +114,14 @@ select { /* modified from https://stackoverflow.com/a/57510283 */
   -moz-appearance: none;
   width: 17.5rem;
   font-size: 1rem;
-  font-weight: 100;
+  font-weight: 200;
   appearance: none;
-  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50' fill='%23FEC751'><polygon points='0,0 100,0 50,50'/></svg>") no-repeat;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50' fill='white'><polygon points='0,0 100,0 50,50'/></svg>") no-repeat;
   background-size: 12px;
   background-position: calc(100% - 10px) center;
   background-repeat: no-repeat;
   background-color: rgb(85, 56, 100);
-  color: rgb(254, 199, 81);
+  color: white;
   padding: 0.25rem;
   margin: 0.5rem;
 
@@ -150,7 +163,7 @@ b {
 }
 
 a {
-  color: dodgerblue;
+  color: #0070dd;
 }
 
 

@@ -62,7 +62,7 @@
           </div>
         </div>
 
-        <h2>States <span style="color:#378b37;">that meet</span> WHO guidelines<sup style="font-weight: 300;"><a href="#methodology" style="color: rgb(40, 20, 70); text-decoration: none;">*</a></sup>:  <span style="color:#378b37;">{{statesWithLowPositivity.length}}</span></h2>
+        <h2>States <span style="color:rgb(18,136,18);">that meet</span> WHO guidelines<sup style="font-weight: 300;"><a href="#methodology" style="color: rgb(40, 20, 70); text-decoration: none;">*</a></sup>:  <span style="color:rgb(18,136,18);">{{statesWithLowPositivity.length}}</span></h2>
 
         <statetable :statedata="statesWithLowPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
 
@@ -101,21 +101,25 @@
       <p>The numbers in this chart represent a 1 week average.</p>
     </div>
 
-    <div class="container">
+    <footer>
+      <div class="container">
 
-      <p>This page was last updated on {{lastUpdated.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}) }}.</p>
+        <p>This page was last updated on {{lastUpdated.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}) }}.</p>
 
-      <p id="methodology">
-        Data Sources: <a href="https://api.covid19india.org/">covid19india.org</a> (states) & <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a> (districts)
-        <span style="font-weight: 700">&middot;</span>
-        <a href="https://github.com/aatishb/indiatestpositivitydata">Data Archive</a>
-        <span style="font-weight: 700">&middot;</span>
-        <sup style="font-weight: 500;">*</sup><a href="https://github.com/aatishb/indiatesttracker">Methodology, Code & Credits</a>
-        <span style="font-weight: 700">&middot;</span>
-        <a href="https://github.com/aatishb/indiatesttracker/issues/new/choose">File an Issue</a>
-      </p>
+        <p><sup style="font-weight: 500;">*</sup><a href="https://github.com/aatishb/indiatesttracker#readme">How do we calculate test positivity?</a></p>
 
-    </div>
+        <p id="methodology">
+          Data Sources: <a href="https://api.covid19india.org/">covid19india.org</a> (states) & <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a> (districts)
+          <span style="font-weight: 700">&middot;</span>
+          <a href="https://github.com/aatishb/indiatestpositivitydata">Data Archive</a>
+          <span style="font-weight: 700">&middot;</span>
+          <a href="https://github.com/aatishb/indiatesttracker">Code & Credits</a>
+          <span style="font-weight: 700">&middot;</span>
+          <a href="https://github.com/aatishb/indiatesttracker/issues/new/choose">File an Issue</a>
+        </p>
+
+      </div>
+    </footer>
 
   </div>
 
