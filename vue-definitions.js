@@ -202,6 +202,9 @@ Vue.component('gridmap', {
   },
 
   watch: {
+    statedata() {
+      this.drawMap();
+    }
   },
 
   data() {
@@ -610,6 +613,8 @@ Vue.component('graph', {
           width = 660 - margin.left - margin.right,
           height = 400 - margin.top - margin.bottom;
 
+      d3.select(this.$el).selectAll("svg").remove();
+
       var svg = d3.select(this.$el)
         .append("svg")
           .attr("viewBox", '0 0 ' + String(width + margin.left + margin.right) + ' ' + String(height + margin.top + margin.bottom))
@@ -757,6 +762,13 @@ Vue.component('graph', {
     //console.log(this.data.map(e => [e['Date'], e[this.metric]]));
     this.drawGraph();
   },
+
+  watch: {
+    data() {
+      this.drawGraph();
+    }
+  }
+
 
 });
 
