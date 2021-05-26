@@ -475,6 +475,25 @@ Vue.component('statetable', {
 
 });
 
+Vue.component('caveat', {
+
+  template: `<div id="caveat" @click="expand = true" :style="{'max-height': expand ? '33rem' : '9rem'}">
+
+        <span v-if="expand">
+        ⚠️ <i>Be careful when interpreting COVID testing data, as this data leaves out people who haven't been tested or who don't have access to tests. This is particularly a problem in rural India where there is a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe testing shortage</a>. There are also differences in how states report numbers, and occasional errors in data collection. While testing data can be useful for revealing trends, <b>policy decisions about reopenings should not be based on COVID testing data alone</b> and should take into account <a href="https://apps.who.int/iris/handle/10665/332073">other measures of community spread</a>.</i>
+        </span>
+        <span v-else>
+        ⚠️ <i>Be careful when interpreting COVID testing data, as it leaves out people who haven't been tested or who don't have access to tests. <b><a>Read more.</a></b></i> 
+        </span>
+      </div>`,
+
+  data() {
+    return {
+      expand: false,
+    };
+  }
+
+});
 
 // 1. Define route components.
 const Main = {
@@ -486,15 +505,7 @@ const Main = {
 
       <h1 style="text-align: center;">What Percentage of COVID-19 Tests are Positive in Indian States?</h1>
 
-      <div class="caveat" @click="expand = true" :style="{'max-height': expand ? '33rem' : '9rem'}">
-
-        <span v-if="expand">
-        ⚠️ <i>Be careful when interpreting COVID testing data, as this data leaves out people who haven't been tested or who don't have access to tests. This is particularly a problem in rural India where there is a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe testing shortage</a>. There are also differences in how states report numbers, and occasional errors in data collection. While testing data can be useful for revealing trends, <b>policy decisions about reopenings should not be based on COVID testing data alone</b> and should take into account <a href="https://apps.who.int/iris/handle/10665/332073">other measures of community spread</a>.</i>
-        </span>
-        <span v-else>
-        ⚠️ <i>Be careful when interpreting COVID testing data, as it leaves out people who haven't been tested or who don't have access to tests. <b><a>Read more.</a></b></i> 
-        </span>
-      </div>
+      <caveat></caveat>
 
       <p>Before reopening a region, the WHO recommends that <b>the percentage of COVID tests that are positive should be <a href="https://apps.who.int/iris/handle/10665/332073">less than 5 percent</a></b>. This means that out of 100 tests conducted, fewer than 5 should be positive on average.</p>
 
@@ -523,12 +534,12 @@ const Main = {
           </div>
         </div>
 
-        <h2>States reporting numbers <span style="color:rgb(18,136,18);">that meet</span> WHO guidelines<sup style="font-weight: 300;"><a href="#methodology" style="color: rgb(40, 20, 70); text-decoration: none;">*</a></sup>:  <span style="color:rgb(18,136,18);">{{statesWithLowPositivity.length}}</span></h2>
+        <h2>States reporting numbers <span style="color:rgb(18,136,18);">that meet</span> WHO guidelines<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup>:  <span style="color:rgb(18,136,18);">{{statesWithLowPositivity.length}}</span></h2>
 
         <statetable :statedata="statesWithLowPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
 
         <br>
-        <h2>States reporting numbers <span style="color:crimson;">that don't meet</span> WHO guidelines<sup style="font-weight: 300;"><a href="#methodology" style="color: rgb(40, 20, 70); text-decoration: none;">*</a></sup>: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
+        <h2>States reporting numbers <span style="color:crimson;">that don't meet</span> WHO guidelines<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup>: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
 
         <statetable :statedata="statesWithHighPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
 
@@ -577,7 +588,6 @@ const Main = {
 
   data() {
     return {
-      expand: false,
       viewMode: 'table',
       showtestnumbers: false,
       showtrend: true,
@@ -788,15 +798,7 @@ const State = {
 
       <h1 style="text-align: center; margin-top: 0.5rem;">What Percentage of COVID-19 Tests are Positive in {{state}}?</h1>
 
-      <div class="caveat" @click="expand = true" :style="{'max-height': expand ? '33rem' : '9rem'}">
-
-        <span v-if="expand">
-        ⚠️ <i>Be careful when interpreting COVID testing data, as this data leaves out people who haven't been tested or who don't have access to tests. This is particularly a problem in rural India where there is a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe testing shortage</a>. There are also differences in how states report numbers, and occasional errors in data collection. While testing data can be useful for revealing trends, <b>policy decisions about reopenings should not be based on COVID testing data alone</b> and should take into account <a href="https://apps.who.int/iris/handle/10665/332073">other measures of community spread</a>.</i>
-        </span>
-        <span v-else>
-        ⚠️ <i>Be careful when interpreting COVID testing data, as it leaves out people who haven't been tested or who don't have access to tests. <b><a>Read more.</a></b></i> 
-        </span>
-      </div>
+      <caveat></caveat>
 
       <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'Share of Positive Tests in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
       <br>
@@ -834,12 +836,6 @@ const State = {
     }
 
   },
-
-  data() {
-    return {
-      expand: false,
-    };
-  }
 
 };
 

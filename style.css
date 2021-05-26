@@ -64,7 +64,7 @@ footer a {
   color: #00bfff; 
 }
 
-.caveat {
+#caveat {
   border: 2px solid rgb(0, 0, 51);
   padding: 0.75rem;
   background-color: lightgoldenrodyellow;
