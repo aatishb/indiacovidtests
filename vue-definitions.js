@@ -601,6 +601,7 @@ Vue.component('graph', {
     drawGraph() {
 
       let metric = this.metric;
+
       let data = this.data.map(d => ({
         datestring: d['Date'], 
         date: d3.timeParse("%Y-%m-%d")(d['Date']), 
@@ -685,13 +686,13 @@ Vue.component('graph', {
         .style("font-size", "1rem")
         .style("font-family", "serif")
         .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x));
+        .call(d3.axisBottom(x).tickSizeOuter(0));
 
       // draw y axis
       svg.append("g")
         .style("font-size", "1rem")
         .style("font-family", "serif")
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y).tickSizeOuter(0));
 
 
       // This allows to find the closest X index of the mouse:
@@ -714,7 +715,7 @@ Vue.component('graph', {
           .style("opacity", 0)
           .style("font-family", "serif")
           .style("font-size", "1rem")
-          .attr("text-anchor", "left")
+          .attr("text-anchor", "center")
           .attr("alignment-baseline", "middle")
 
       // Create a rect on top of the svg area: this rectangle recovers mouse position
@@ -744,7 +745,7 @@ Vue.component('graph', {
           .attr("cx", x(d.date))
           .attr("cy", y(d.value))
         focusText
-          .html('Date: ' + d.datestring + ' ' + metric + ': ' + d.value)
+          .html('Date: ' + d.datestring + '&nbsp;&nbsp;&nbsp;&nbsp;' + (metric  == 'Test Positivity Rate' ? 'Share of Positive Cases' : metric) + ': ' + parseFloat(d.value).toLocaleString())
           .attr("x", 0)
           .attr("y", height + margin.bottom - 10)
         }
@@ -780,9 +781,9 @@ const State = {
   template: `
   <div>
     <div class="container">
-      <div style="  font-size: 0.9rem; font-weight: 600;"><router-link to="/">Home</router-link> <b>></b> <router-link :to="abbreviation">{{state}}</router-link></div>
+      <div style="  font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;"><router-link to="/">Home</router-link> <b>></b> <router-link :to="abbreviation">{{state}}</router-link></div>
 
-      <h1 style="text-align: center;">{{state}} COVID-19 Test Tracker</h1>
+      <h1 style="text-align: center; margin-top: 0.5rem;">What Percentage of COVID-19 Tests are Positive in {{state}}?</h1>
 
       <div class="caveat" @click="expand = true" :style="{'max-height': expand ? '33rem' : '9rem'}">
 
@@ -794,13 +795,13 @@ const State = {
         </span>
       </div>
 
+      <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'Share of Positive Tests in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
+      <br>
       <graph :data="stateTimeSeries" metric="Weekly Cases" :title="'Weekly COVID Cases in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
       <br>
       <graph :data="stateTimeSeries" metric="Weekly Tests" :title="'Weekly COVID Tests in ' + state" stroke="black" fill="rgba(0,255,0,0.2)"></graph>
       <br>
-      <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'% Positive Tests in ' + state + ' (7 day average)'" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
-      <br>
-      <p>To calculate the <b>Percentage of Positive Tests</b> (third graph), we divide the <b>Weekly Cases</b> (first graph) by the <b>Weekly Tests</b> (second graph).</p>
+      <p>The <b>Share of Positive Tests</b> (first graph) is calculated by dividing the <b>Weekly Cases</b> (second graph) by the <b>Weekly Tests</b> (third graph).</p>
 
     </div>
 
