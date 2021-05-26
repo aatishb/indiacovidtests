@@ -55,6 +55,7 @@ body {
 footer {
   background-color: rgb(85, 56, 100);
   color: white;
+  margin-top: 1rem;
   padding-top: 1rem;
   padding-bottom: 1rem;
   font-weight: 400;

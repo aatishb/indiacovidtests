@@ -495,6 +495,33 @@ Vue.component('caveat', {
 
 });
 
+
+Vue.component('pagemenu', {
+
+  props: ['viewMode'],
+
+  template: `
+  <div class="container">
+      <div style="display: flex; flex-direction: row; justify-content: center;">
+        <button @click="$emit('update:viewMode', 'table')" :style="viewMode == 'table' ? selectedButtonStyle : ''">Table View</button>
+        <button @click="$emit('update:viewMode', 'chart')" :style="viewMode == 'chart' ? selectedButtonStyle : ''">Chart View</button>
+        <button @click="$emit('update:viewMode', 'map')" :style="viewMode == 'map' ? selectedButtonStyle : ''">Map View</button>
+      </div>
+    </div>
+`,
+
+  data() {
+    return {
+      selectedButtonStyle: {
+        'background-color': 'rgb(119, 62, 122)',
+        'color': 'rgb(254, 199, 81)',
+        'border': '0.125rem solid rgb(119, 62, 122)', 
+      }
+    };
+  }
+
+});
+
 // 1. Define route components.
 const Main = {
   props: ['recentData'],
@@ -503,7 +530,7 @@ const Main = {
   <div>
     <div class="container">
 
-      <h1 style="text-align: center;">What Percentage of COVID-19 Tests are Positive in Indian States?</h1>
+      <h1 style="text-align: center;">What Percentage of COVID Tests are Positive in Indian States?</h1>
 
       <caveat></caveat>
 
@@ -511,13 +538,7 @@ const Main = {
 
     </div>
 
-    <div class="container">
-      <div style="display: flex; flex-direction: row; justify-content: center;">
-        <button @click="viewMode = 'table'">Table View</button>
-        <button @click="viewMode = 'chart'">Chart View</button>
-        <button @click="viewMode = 'map'">Map View</button>
-      </div>
-    </div>
+    <pagemenu v-bind:view-mode.sync="viewMode"></pagemenu>
 
     <div v-if="viewMode == 'table'">
       <div class="container">
@@ -571,6 +592,9 @@ const Main = {
       <gridmap :statedata="recentData"></gridmap>
       <p>The numbers in this chart represent a 1 week average.</p>
     </div>
+
+    <pagemenu v-bind:view-mode.sync="viewMode"></pagemenu>
+
   </div>
   `,
 
@@ -601,7 +625,6 @@ const Main = {
     };
   }
 };
-
 
 Vue.component('graph', {
   
@@ -644,7 +667,7 @@ Vue.component('graph', {
         .style('fill', 'rgb(0,0,51)')
         .style('stroke', 'none')
         .style('font-size', '1.5rem')
-        .style('font-weight', '600')
+        .style('font-weight', '500')
         .style("font-family", "serif");
 
         /*
@@ -794,29 +817,66 @@ const State = {
   template: `
   <div>
     <div class="container">
-      <div style="  font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;"><router-link to="/">Home</router-link> <b>></b> <router-link :to="abbreviation">{{state}}</router-link></div>
 
-      <h1 style="text-align: center; margin-top: 0.5rem;">What Percentage of COVID-19 Tests are Positive in {{state}}?</h1>
+      <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
+        <router-link to="/">Home</router-link>
+        <b>></b>
+        <div style="display: inline-block;">
+          <select v-model="selectedState" @change="changeState">
+            <option v-for="s in stateSelect" :value="s.value">
+              {{s.value}}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <h1 style="text-align: center; margin-top: 0.5rem;">What Percentage of COVID Tests are Positive in {{state}}?</h1>
 
       <caveat></caveat>
 
+      <p>The <b>Share of Positive Tests</b> is the <b>Weekly Cases</b> divided by the <b>Weekly Tests</b>.</p>
       <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'Share of Positive Tests in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
       <br>
       <graph :data="stateTimeSeries" metric="Weekly Cases" :title="'Weekly COVID Cases in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
       <br>
       <graph :data="stateTimeSeries" metric="Weekly Tests" :title="'Weekly COVID Tests in ' + state" stroke="black" fill="rgba(0,255,0,0.2)"></graph>
       <br>
-      <p>The <b>Share of Positive Tests</b> (first graph) is calculated by dividing the <b>Weekly Cases</b> (second graph) by the <b>Weekly Tests</b> (third graph).</p>
+
+      <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
+        <router-link to="/">Home</router-link>
+        <b>></b>
+        <div style="display: inline-block;">
+          <select v-model="selectedState" @change="changeState">
+            <option v-for="s in stateSelect" :value="s.value">
+              {{s.value}}
+            </option>
+          </select>
+        </div>
+      </div>
 
     </div>
-
 
   </div>
   `,
 
   computed: {
     state() {
-      return Object.keys(this.abbreviations).filter(e => this.abbreviations[e] == this.$route.params.id)[0];
+      let state = Object.keys(this.abbreviations).filter(e => this.abbreviations[e] == this.$route.params.id)[0];
+      this.selectedState = state;
+      return state;
+    },
+
+    states() {
+      return this.recentData.map(e => e.state);
+    },
+
+    stateSelect() {
+      return Object.keys(this.abbreviations)
+      .filter(state => this.states.includes(state))
+      .map(state => ({
+        value: state,
+        abbreviation: this.abbreviations[state]
+      }));
     },
 
     stateData() {
@@ -836,6 +896,19 @@ const State = {
     }
 
   },
+
+  methods: {
+    changeState() {
+      //console.log('selected state: ', this.selectedState, this.abbreviations[this.selectedState]);
+      this.$router.push(this.abbreviations[this.selectedState]);
+    }
+  },
+
+  data() {
+    return {
+      selectedState: ''
+    }
+  }
 
 };
 
