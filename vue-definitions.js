@@ -822,7 +822,7 @@ const State = {
         <router-link to="/">Home</router-link>
         <b>></b>
         <div style="display: inline-block;">
-          <select v-model="selectedState" @change="changeState" style="width: 15.5rem;">
+          <select v-model="selectedState" @change="changeState" style="font-size: 0.9rem; width: 15.5rem; padding: 0.1rem; margin: 0rem;">
             <option v-for="s in stateSelect" :value="s.value">
               {{s.value}}
             </option>
@@ -846,7 +846,7 @@ const State = {
         <router-link to="/">Home</router-link>
         <b>></b>
         <div style="display: inline-block;">
-          <select v-model="selectedState" @change="changeState" style="width: 15.5rem;">
+          <select v-model="selectedState" @change="changeState" style="font-size: 0.9rem; width: 15.5rem; padding: 0.1rem; margin: 0rem;">
             <option v-for="s in stateSelect" :value="s.value">
               {{s.value}}
             </option>
