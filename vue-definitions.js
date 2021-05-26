@@ -820,7 +820,7 @@ const State = {
 
       <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
         <router-link to="/">Home</router-link>
-        <b>></b>
+        <span style="font-size: 0.66rem;">▶︎</span>
         <div style="display: inline-block;">
           <select v-model="selectedState" @change="changeState" style="font-size: 0.9rem; width: 15.5rem; padding: 0.1rem; margin: 0rem;">
             <option v-for="s in stateSelect" :value="s.value">
@@ -844,7 +844,7 @@ const State = {
 
       <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
         <router-link to="/">Home</router-link>
-        <b>></b>
+        <span style="font-size: 0.66rem;">▶︎</span>
         <div style="display: inline-block;">
           <select v-model="selectedState" @change="changeState" style="font-size: 0.9rem; width: 15.5rem; padding: 0.1rem; margin: 0rem;">
             <option v-for="s in stateSelect" :value="s.value">
