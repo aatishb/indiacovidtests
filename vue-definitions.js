@@ -101,7 +101,8 @@ Vue.component('gridmap', {
         .text("What Percentage of COVID Tests are Positive?")
         .style('fill', 'rgb(0,0,51)')
         .style('stroke', 'none')
-        .style('font-size', '1.25rem')
+        .style('font-size', '1.5rem')
+        .style('font-weight', '500')
         .style("font-family", "serif");
 
       var x = d3.scaleLinear()
@@ -296,6 +297,7 @@ Vue.component('chart', {
         .attr("y", -30)
         .text(this.selected == 'weeklytestspercapita' ? "Number of Weekly Tests (per 1,000 people)" : "What Percentage of COVID Tests are Positive?")
         .style("font-family", "serif")
+        .style('font-weight', '500')
         .style("color", "rgb(0,0,51)");
 
       if (this.selected == 'change') {
@@ -632,6 +634,7 @@ Vue.component('graph', {
         .style('fill', 'rgb(0,0,51)')
         .style('stroke', 'none')
         .style('font-size', '1.5rem')
+        .style('font-weight', '600')
         .style("font-family", "serif");
 
         /*
