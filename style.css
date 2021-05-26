@@ -126,6 +126,10 @@ select { /* modified from https://stackoverflow.com/a/57510283 */
 
 }
 
+.line {
+  display: inline-block;
+}
+
 
 h1 {
   margin-top:1rem;

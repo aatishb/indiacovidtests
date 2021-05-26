@@ -179,7 +179,7 @@ Vue.component('gridmap', {
               .attr("y", y(1 + state.y))
               .text(state.abbr)
               .style('font-size', '1.25rem')
-              .style('fill', data ? (data.positivityrate <= 0.3 ? 'black' : 'white') : 'black')
+              .style('fill', data ? (data.positivityrate < 0.2 ? 'black' : 'white') : 'black')
               .style('stroke', 'none')
               .style('visibility', 'hidden')
               .on("mouseover", () => mouseover(data))
@@ -453,9 +453,9 @@ Vue.component('statetable', {
 
     sort(data, key) {
       if(key == 'state') {
-        return this.sortorder[key] ? this.statedata.sort((a,b) => a[key] > b[key] ? 1 : -1) : this.statedata.sort((a,b) => a[key] > b[key] ? 1 : -1).reverse();
+        return this.sortorder[key] ? data.sort((a,b) => a[key] > b[key] ? 1 : -1) : data.sort((a,b) => a[key] > b[key] ? 1 : -1).reverse();
       } else {
-        return this.sortorder[key] ? this.statedata.sort((a,b) => parseFloat(b[key]) - parseFloat(a[key])) : this.statedata.sort((a,b) => parseFloat(b[key]) - parseFloat(a[key])).reverse();        
+        return this.sortorder[key] ? data.sort((a,b) => parseFloat(b[key]) - parseFloat(a[key])) : data.sort((a,b) => parseFloat(b[key]) - parseFloat(a[key])).reverse();        
       }
     }
 
@@ -645,7 +645,7 @@ Vue.component('graph', {
 
 
       // set the dimensions and margins of the chart
-      var margin = {top: 60, right: 30, bottom: 60, left: 80},
+      var margin = {top: 15, right: 30, bottom: 60, left: 80},
           width = 660 - margin.left - margin.right,
           height = 400 - margin.top - margin.bottom;
 
@@ -658,6 +658,7 @@ Vue.component('graph', {
           .attr("transform",
                 "translate(" + margin.left + "," + margin.top + ")");
 
+    /*
     svg.append("text")
         .attr("class", "title")
         .attr("text-anchor", "middle")
@@ -669,6 +670,7 @@ Vue.component('graph', {
         .style('font-size', '1.5rem')
         .style('font-weight', '500')
         .style("font-family", "serif");
+    */
 
         /*
   // text label for the y axis
@@ -812,7 +814,7 @@ Vue.component('graph', {
 
 
 const State = { 
-  props: ['recentData', 'allData', 'abbreviations'],
+  props: ['recentData', 'allData', 'abbreviations', 'districtData'],
 
   template: `
   <div>
@@ -821,7 +823,7 @@ const State = {
       <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
         <router-link to="/">Home</router-link>
         <span style="font-size: 0.66rem;">▶︎</span>
-        <div style="display: inline-block;">
+        <div class="line">
           <select v-model="selectedState" @change="changeState" style="font-size: 0.9rem; width: 15.5rem; padding: 0.1rem; margin: 0rem;">
             <option v-for="s in stateSelect" :value="s.value">
               {{s.value}}
@@ -834,18 +836,36 @@ const State = {
 
       <caveat></caveat>
 
+      <h2>Share of Positive Tests in in {{state}}</h2>
       <p>The <b>Share of Positive Tests</b> is the <b>Weekly Cases</b> divided by the <b>Weekly Tests</b>.</p>
       <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'Share of Positive Tests in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
-      <br>
+      <h2>Weekly COVID Cases in {{state}}</h2>
       <graph :data="stateTimeSeries" metric="Weekly Cases" :title="'Weekly COVID Cases in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
-      <br>
+      <h2>Weekly COVID Tests in {{state}}</h2>
       <graph :data="stateTimeSeries" metric="Weekly Tests" :title="'Weekly COVID Tests in ' + state" stroke="black" fill="rgba(0,255,0,0.2)"></graph>
       <br>
+
+      <div v-if="districtDataForThisState.length > 0" style="margin-bottom: 1rem;">
+        <h2>{{state}} Districts with > 10% Share of Positive Tests</h2>
+        <table>
+          <tr>
+            <th class="columntitle" @click="changekey('district')"><b>District</b> <span v-if="key == 'district'">{{(sortorder[key]) ? '▼' : '▲'}}</span></th>
+            <th class="columntitle" @click="changekey('positivityrate')"><b>% Positive Tests</b> <span v-if="key == 'positivityrate'">{{(sortorder[key]) ? '▼' : '▲'}}</span> <br><span class="light">(6 day average)</span></th>
+          </tr>
+          <tr v-for="(district,i) in sort(districtDataForThisState, key)" :key="i">
+            <td>{{district.district.split(' ').map(e => e[0].toUpperCase() + e.toLowerCase().substr(1)).join(' ')}}</td>
+            <td>{{district.positivityratestring}}</td>
+          </tr>
+        </table>
+        <br>
+        <p>Table updated on {{lastUpdate.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}) }}</p>
+      </div>
+
 
       <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
         <router-link to="/">Home</router-link>
         <span style="font-size: 0.66rem;">▶︎</span>
-        <div style="display: inline-block;">
+        <div class="line">
           <select v-model="selectedState" @change="changeState" style="font-size: 0.9rem; width: 15.5rem; padding: 0.1rem; margin: 0rem;">
             <option v-for="s in stateSelect" :value="s.value">
               {{s.value}}
@@ -893,6 +913,19 @@ const State = {
 
     path() {
         return this.$route.name;
+    },
+
+    districtDataForThisState() {
+      return this.districtData.filter(e => e['State'] == this.state.toUpperCase()).map(e => ({
+        district: e['District'],
+        positivityrate: parseFloat(e['Test Positivity Rate']),
+        positivityratestring: (100 * parseFloat(e['Test Positivity Rate'])).toFixed(1) + '%',
+      }));
+    },
+
+    lastUpdate() {
+      let [y, m, d] = this.districtData.slice(-1)[0]['Date'].split('-');
+      return new Date(y,m - 1,d);      
     }
 
   },
@@ -901,12 +934,36 @@ const State = {
     changeState() {
       //console.log('selected state: ', this.selectedState, this.abbreviations[this.selectedState]);
       this.$router.push(this.abbreviations[this.selectedState]);
-    }
-  },
+    },
 
+    changekey(key) {
+      this.key = key;
+      this.sortorder[key] = !this.sortorder[key];
+      // restore other column sort to default
+      for (let k of Object.keys(this.sortorder)) {
+        if (k !== key) {
+          this.sortorder[k] = false;
+        }
+      }
+    },
+
+    sort(data, key) {
+      if(key == 'district') {
+        return this.sortorder[key] ? data.sort((a,b) => a[key] > b[key] ? 1 : -1) : data.sort((a,b) => a[key] > b[key] ? 1 : -1).reverse();
+      } else {
+        return this.sortorder[key] ? data.sort((a,b) => parseFloat(b[key]) - parseFloat(a[key])) : data.sort((a,b) => parseFloat(b[key]) - parseFloat(a[key])).reverse();        
+      }
+    }
+
+  },
   data() {
     return {
-      selectedState: ''
+      selectedState: '',
+      key: 'positivityrate',
+      sortorder: {
+        'district': false,
+        'positivityrate': true,
+      }
     }
   }
 
@@ -970,6 +1027,19 @@ let app = new Vue({
       this.recentData = recentData;
 
     });
+
+    d3.csv('https://raw.githubusercontent.com/aatishb/indiatestpositivitydata/main/districtdata.csv', data => {
+
+      let lastUpdate = data.slice(-1)[0]['Date'];
+      let [y, m, d] = lastUpdate.split('-');
+      this.lastUpdatedDistrict = new Date(y,m - 1,d);
+
+      let districtData = data.filter(e => e['Date'] == lastUpdate);
+
+      this.districtData = districtData;
+
+    });
+
 
   },
 
@@ -1056,6 +1126,7 @@ let app = new Vue({
     },
     allData: [],
     recentData: [],
+    districtData: [],
     lastUpdated: new Date(),
   }
 
