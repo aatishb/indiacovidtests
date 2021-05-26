@@ -484,8 +484,6 @@ const Main = {
 
       <h1 style="text-align: center;">What Percentage of COVID-19 Tests are Positive in Indian States?</h1>
 
-      <p>Before reopening a region, the WHO recommends that <b>the percentage of COVID tests that are positive should be <a href="https://apps.who.int/iris/handle/10665/332073">less than 5 percent</a></b>. This means that out of 100 tests conducted, fewer than 5 should be positive on average.</p>
-
       <div class="caveat" @click="expand = true" :style="{'max-height': expand ? '33rem' : '9rem'}">
 
         <span v-if="expand">
@@ -495,6 +493,8 @@ const Main = {
         ⚠️ <i>Be careful when interpreting COVID testing data, as it leaves out people who haven't been tested or who don't have access to tests. <b><a>Read more.</a></b></i> 
         </span>
       </div>
+
+      <p>Before reopening a region, the WHO recommends that <b>the percentage of COVID tests that are positive should be <a href="https://apps.who.int/iris/handle/10665/332073">less than 5 percent</a></b>. This means that out of 100 tests conducted, fewer than 5 should be positive on average.</p>
 
     </div>
 
@@ -521,12 +521,12 @@ const Main = {
           </div>
         </div>
 
-        <h2>States <span style="color:rgb(18,136,18);">that meet</span> WHO guidelines<sup style="font-weight: 300;"><a href="#methodology" style="color: rgb(40, 20, 70); text-decoration: none;">*</a></sup>:  <span style="color:rgb(18,136,18);">{{statesWithLowPositivity.length}}</span></h2>
+        <h2>States reporting numbers <span style="color:rgb(18,136,18);">that meet</span> WHO guidelines<sup style="font-weight: 300;"><a href="#methodology" style="color: rgb(40, 20, 70); text-decoration: none;">*</a></sup>:  <span style="color:rgb(18,136,18);">{{statesWithLowPositivity.length}}</span></h2>
 
         <statetable :statedata="statesWithLowPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
 
         <br>
-        <h2>States <span style="color:crimson;">that don't meet</span> WHO guidelines<sup style="font-weight: 300;"><a href="#methodology" style="color: rgb(40, 20, 70); text-decoration: none;">*</a></sup>: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
+        <h2>States reporting numbers <span style="color:crimson;">that don't meet</span> WHO guidelines<sup style="font-weight: 300;"><a href="#methodology" style="color: rgb(40, 20, 70); text-decoration: none;">*</a></sup>: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
 
         <statetable :statedata="statesWithHighPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
 
@@ -780,6 +780,7 @@ const State = {
   template: `
   <div>
     <div class="container">
+      <div style="  font-size: 0.9rem; font-weight: 600;"><router-link to="/">Home</router-link> <b>></b> <router-link :to="abbreviation">{{state}}</router-link></div>
 
       <h1 style="text-align: center;">{{state}} COVID-19 Test Tracker</h1>
 
@@ -818,7 +819,16 @@ const State = {
 
     stateTimeSeries() {
       return this.allData.filter(e => e['State'] == this.state.toUpperCase());      
-    }    
+    },    
+
+    abbreviation() {
+      return this.$route.params.id;
+    },
+
+    path() {
+        return this.$route.name;
+    }
+
   },
 
   data() {
