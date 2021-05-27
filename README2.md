@@ -13,7 +13,7 @@ With thanks to Prasun Mahanti, Manu Prakash, Harsha Devulapalli, and [IndiaCovid
 
 The charts & graphs build on starter code from the [D3.js Graph Gallery](https://www.d3-graph-gallery.com/index.html) by Yan Holtz.
 
-The map builds on [this map](https://bl.ocks.org/officeofjane/d33d6ef783993b60b15a3fe0f8da1481) by Jane Pong.
+The map visualization builds on [this map](https://bl.ocks.org/officeofjane/d33d6ef783993b60b15a3fe0f8da1481) by Jane Pong.
 
 This website uses the following javascript libraries:
 
