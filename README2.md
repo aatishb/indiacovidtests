@@ -1,11 +1,13 @@
 # India Test Tracker
-An [interactive website](https://aatishb.com/indiatesttracker/) that lists & visualizes COVID testing data provided by the Indian Government
+An [interactive website](https://aatishb.com/indiatesttracker/) that lists & visualizes COVID testing data provided by the Indian Government.
 
 # Data
-The state data is provided by [covid19india.org](https://api.covid19india.org/) and the district data is provided by the Indian [Ministry of Health](https://www.mohfw.gov.in/). [Click here](https://github.com/aatishb/indiatestpositivitydata) for more details and an archive of the data.
+The state data is provided by [covid19india.org](https://api.covid19india.org/) and the district data is provided by the Indian [Ministry of Health](https://www.mohfw.gov.in/).
+
+For more details & an archive of the data, visit [this github repository](https://github.com/aatishb/indiatestpositivitydata).
 
 # Credits & License
-India Test Tracker is developed by [Aatish Bhatia](https://aatishb.com/). 
+India Test Tracker is developed by [Aatish Bhatia](https://aatishb.com/). The code for this website is available [here](https://github.com/aatishb/indiatesttracker).
 
 With thanks to Prasun Mahanti, Manu Prakash, Harsha Devulapalli, and [IndiaCovidSOS](https://www.indiacovidsos.org/) members for feedback & ideas.
 
@@ -19,4 +21,4 @@ This website uses the following javascript libraries:
 - [vue.js](https://vuejs.org/) (for interactivity)
 - [d3.geo2rect](https://github.com/sebastian-meier/d3.geo2rect) (for morphing map into tile grid)
 
-All code in this repository with no prior license is published under the open-source [MIT License]().
+All code in this repository with no prior license is published under the open-source [MIT License](https://github.com/aatishb/indiatesttracker/blob/main/LICENSE).
