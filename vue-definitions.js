@@ -23,8 +23,8 @@ Vue.component('gridmap', {
           }, 1000);
         } else {
           setTimeout(function() {
-            d3.selectAll('.label').style('visibility', 'visible');          
           }, 1000);
+            d3.selectAll('.label').style('visibility', 'visible');          
         }
         this.g2r.draw();     
         //console.log(this.g2r.mode);
@@ -303,12 +303,12 @@ Vue.component('chart', {
       if (this.selected == 'change') {
 
         // Lines
-        svg.selectAll()
+        let mylines = svg.selectAll()
           .data(data)
           .enter()
           .append("line")
             .attr("x1", function(d) { return x(d.pastpositivityrate); })
-            .attr("x2", function(d) { return x(d.positivityrate); })
+            .attr("x2", function(d) { return x(d.pastpositivityrate); })
             .attr("y1", function(d) { return y(d.state); })
             .attr("y2", function(d) { return y(d.state); })
             .attr("stroke", "rgba(0,0,0,0.2)");
@@ -321,17 +321,28 @@ Vue.component('chart', {
             .attr("cx", function(d) { return x(d.pastpositivityrate); })
             .attr("cy", function(d) { return y(d.state); })
             .attr("r", "6")
-            .style("fill", function(d) { return d.pastpositivityrate > 0.05 ? 'rgb(247,206,206)' : 'rgb(214,230,205)'; });
+            .style("fill", function(d) { return d.pastpositivityrate > 0.05 ? 'rgb(247,206,206)' : 'rgb(138, 217, 132)'; });
 
         // Circles of variable 2
-        svg.selectAll()
+        let mycircles = svg.selectAll()
           .data(data)
           .enter()
           .append("circle")
-            .attr("cx", function(d) { return x(d.positivityrate); })
+            .attr("cx", function(d) { return x(d.pastpositivityrate); })
             .attr("cy", function(d) { return y(d.state); })
             .attr("r", "6")
-            .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : 'rgb(18,136,18)'; });
+            .style("fill", function(d) { return d.pastpositivityrate > 0.05 ? 'crimson' : 'rgb(18,136,18)'; });
+
+        // Change the X coordinates of line and circle
+        mycircles.transition()
+          .duration(2000)
+          .attr("cx", function(d) { return x(d.positivityrate); })
+          .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : 'rgb(18,136,18)'; });
+
+
+        mylines.transition()
+          .duration(2000)
+          .attr("x2", function(d) { return x(d.positivityrate); });  
 
       } else if (this.selected == 'positivityrate') {
 
