@@ -1006,7 +1006,12 @@ const router = new VueRouter({
   mode: 'history',
   base: '/indiatesttracker/',
   scrollBehavior (to, from, savedPosition) {
-    return { x: 0, y: 0 }
+    if (to.hash) { // https://stackoverflow.com/a/40343137
+        return {selector: to.hash};
+    } else {
+        return { x: 0, y: 0 };
+    }
+
   },
   routes: routes // short for `routes: routes`
 });
