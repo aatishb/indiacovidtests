@@ -19,6 +19,6 @@ This website uses the following javascript libraries:
 
 - [d3.js](https://d3js.org/) (for graphing)
 - [vue.js](https://vuejs.org/) (for interactivity)
-- [d3.geo2rect](https://github.com/sebastian-meier/d3.geo2rect) (for morphing map into tile grid)
+- [d3.geo2rect](https://github.com/sebastian-meier/d3.geo2rect) (for morphing between map & tile grid)
 
 All code in this repository with no prior license is published under the open-source [MIT License](https://github.com/aatishb/indiatesttracker/blob/main/LICENSE).
