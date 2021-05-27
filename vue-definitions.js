@@ -857,17 +857,20 @@ const State = {
         <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#districts">District Level Data</a></li>
       </ol>
 
-      <h2 id="positivity">Share of Positive Tests in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-      <p><b>% Positive Tests in {{state}} (as of {{lastStateUpdate}}): <span :style="{'color': recentStateData.positivityrate < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{recentStateData.positivityratestring}}</span></b></p>
-      <p>The <b>Share of Positive Tests</b> is the <b>Weekly Cases</b> divided by the <b>Weekly Tests</b>.</p>
-      <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'Share of Positive Tests in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
-      <h2 id="cases">Weekly COVID Cases in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-      <p><b>Weekly COVID Cases in {{state}} (as of {{lastStateUpdate}}): {{parseFloat(recentStateData.weeklycases).toLocaleString()}}</b></p>
-      <graph :data="stateTimeSeries" metric="Weekly Cases" :title="'Weekly COVID Cases in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
-      <h2 id="tests">Weekly COVID Tests in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-      <p><b>Weekly COVID Tests in {{state}} (as of {{lastStateUpdate}}): {{parseFloat(recentStateData.weeklytests).toLocaleString()}}</b></p>
-      <graph :data="stateTimeSeries" metric="Weekly Tests" :title="'Weekly COVID Tests in ' + state" stroke="black" fill="rgba(0,255,0,0.2)"></graph>
-      <br>
+
+      <div v-if="stateTimeSeries">
+        <h2 id="positivity">Share of Positive Tests in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+        <p><b>% Positive Tests in {{state}} (as of {{lastStateUpdate}}): <span :style="{'color': parseFloat(recentStateData['Test Positivity Rate']) < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{(100 * parseFloat(recentStateData['Test Positivity Rate'])).toFixed(1) + '%'}}</span></b></p>
+        <p>The <b>Share of Positive Tests</b> is the <b>Weekly Cases</b> divided by the <b>Weekly Tests</b>.</p>
+        <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'Share of Positive Tests in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
+        <h2 id="cases">Weekly COVID Cases in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+        <p><b>Weekly COVID Cases in {{state}} (as of {{lastStateUpdate}}): {{parseFloat(recentStateData['Weekly Cases']).toLocaleString()}}</b></p>
+        <graph :data="stateTimeSeries" metric="Weekly Cases" :title="'Weekly COVID Cases in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
+        <h2 id="tests">Weekly COVID Tests in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+        <p><b>Weekly COVID Tests in {{state}} (as of {{lastStateUpdate}}): {{parseFloat(recentStateData['Weekly Tests']).toLocaleString()}}</b></p>
+        <graph :data="stateTimeSeries" metric="Weekly Tests" :title="'Weekly COVID Tests in ' + state" stroke="black" fill="rgba(0,255,0,0.2)"></graph>
+        <br>
+      </div>
 
       <div v-if="districtDataForThisState.length > 0" style="margin-bottom: 1rem;">
         <h2 id="districts">% Positive Tests in {{state}} Districts<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
@@ -877,7 +880,7 @@ const State = {
             <th class="columntitle" @click="changekey('positivityrate')"><b>% Positive Tests</b> <span v-if="key == 'positivityrate'">{{(sortorder[key]) ? '▼' : '▲'}}</span> <br><span class="light">(6 day average)</span></th>
           </tr>
           <tr v-for="(district,i) in sort(districtDataForThisState, key)" :key="i">
-            <td>{{district.district.split(' ').map(e => e[0].toUpperCase() + e.toLowerCase().substr(1)).join(' ')}}</td>
+            <td>{{district.district}}</td>
             <td :style="{'color': district.positivityrate < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{district.positivityratestring}}</td>
           </tr>
         </table>
@@ -923,18 +926,18 @@ const State = {
       }));
     },
 
-    recentStateData() {
-      return this.recentData.filter(e => e.state == this.state)[0];
-    },
-
-    lastStateUpdate() {
-      let [y, m, d] = this.recentStateData.date.split('-');
-      return new Date(y,m - 1,d).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});      
-    },
-
     stateTimeSeries() {
       return this.allData.filter(e => e['State'] == this.state.toUpperCase());      
     },    
+
+    recentStateData() {
+      return this.stateTimeSeries.slice(-1)[0];
+    },
+
+    lastStateUpdate() {
+      let [y, m, d] = this.recentStateData['Date'].split('-');
+      return new Date(y,m - 1,d).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});      
+    },
 
     abbreviation() {
       return this.$route.params.id;
@@ -946,7 +949,7 @@ const State = {
 
     districtDataForThisState() {
       return this.districtData.filter(e => e['State'] == this.state.toUpperCase()).map(e => ({
-        district: e['District'],
+        district: e['District'].split(' ').filter(e => e.length > 0).map(e => e.includes('.') ? e : e[0].toUpperCase() + e.toLowerCase().substr(1)).join(' '),
         positivityrate: parseFloat(e['Test Positivity Rate']),
         positivityratestring: (100 * parseFloat(e['Test Positivity Rate'])).toFixed(1) + '%',
       }));
