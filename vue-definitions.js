@@ -488,18 +488,21 @@ Vue.component('statetable', {
 
 Vue.component('caveat', {
 
-  template: `<div id="caveat" @click="expand = true" :style="{'max-height': expand ? '33rem' : '9rem'}">
-
-        <span v-if="expand">
-        ⚠️ <i>Be careful when interpreting COVID testing data, as this data leaves out people who haven't been tested or who don't have access to tests. This is particularly a problem in rural India where there is a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe testing shortage</a>. There are also differences in how states report numbers, and occasional errors in data collection. While testing data can be useful for revealing trends, <b>policy decisions about reopenings should not be based on COVID testing data alone</b> and should take into account <a href="https://apps.who.int/iris/handle/10665/332073">other measures of community spread</a>.</i>
-        </span>
-        <span v-else>
-        ⚠️ <i>Be careful when interpreting COVID testing data, as it leaves out people who haven't been tested or who don't have access to tests. <b><a>Read more.</a></b></i> 
-        </span>
-      </div>`,
+  template: `
+  <div id="caveat" @click="expand = true" :style="{'max-height': expand ? '33rem' : '9rem'}">
+    ⚠️ <span v-html="blurb"></span> <span v-if="expand" v-html="rest"></span> <span v-else @click="expand = true"><a>Read More.</a></span>
+  </div>`,
 
   data() {
     return {
+      blurb: `
+      India's reported COVID cases are likely 15 to 26 times lower than the true number, according to a <a href="https://www.nytimes.com/interactive/2021/05/25/world/asia/india-covid-death-estimates.html">New York Times</a> analysis.
+      `,
+      rest: `
+      There is also a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe</a> <a href="https://science.thewire.in/health/covid-19-poor-testing-in-rural-india-undermines-official-reports-of-case-decline/">shortage</a> of testing in rural India, and <a href="https://theprint.in/india/what-happens-when-covid-test-camp-is-held-in-remote-bihar-village-nothing-no-one-turns-up/663842/">very high testing hesitancy</a>. 
+      States differ significantly in the accuracy, methodology, and level of testing.
+      Because testing data is being severely underreported, please interpret this data with caution.
+      Decisions about reopenings should always take into account <a href="https://apps.who.int/iris/handle/10665/332073">other measures</a> of community spread.`,
       expand: false,
     };
   }
@@ -854,20 +857,20 @@ const State = {
         <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#districts">District Level Data</a></li>
       </ol>
 
-      <h2 id="positivity">Share of Positive Tests in in {{state}}</h2>
+      <h2 id="positivity">Share of Positive Tests in in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
       <p><b>Share of Positive Tests in {{state}} (as of {{lastStateUpdate}}): <span :style="{'color': recentStateData.positivityrate < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{recentStateData.positivityratestring}}</span></b></p>
       <p>The <b>Share of Positive Tests</b> is the <b>Weekly Cases</b> divided by the <b>Weekly Tests</b>.</p>
       <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'Share of Positive Tests in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
-      <h2 id="cases">Weekly COVID Cases in {{state}}</h2>
+      <h2 id="cases">Weekly COVID Cases in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
       <p><b>Weekly COVID Cases in {{state}} (as of {{lastStateUpdate}}): {{parseFloat(recentStateData.weeklycases).toLocaleString()}}</b></p>
       <graph :data="stateTimeSeries" metric="Weekly Cases" :title="'Weekly COVID Cases in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
-      <h2 id="tests">Weekly COVID Tests in {{state}}</h2>
+      <h2 id="tests">Weekly COVID Tests in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
       <p><b>Weekly COVID Tests in {{state}} (as of {{lastStateUpdate}}): {{parseFloat(recentStateData.weeklytests).toLocaleString()}}</b></p>
       <graph :data="stateTimeSeries" metric="Weekly Tests" :title="'Weekly COVID Tests in ' + state" stroke="black" fill="rgba(0,255,0,0.2)"></graph>
       <br>
 
       <div v-if="districtDataForThisState.length > 0" style="margin-bottom: 1rem;">
-        <h2 id="districts">Share of Positive Tests in {{state}} Districts</h2>
+        <h2 id="districts">Share of Positive Tests in {{state}} Districts<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
         <table>
           <tr>
             <th class="columntitle" @click="changekey('district')"><b>District</b> <span v-if="key == 'district'">{{(sortorder[key]) ? '▼' : '▲'}}</span></th>
