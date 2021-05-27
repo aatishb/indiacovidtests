@@ -37,7 +37,7 @@ Vue.component('gridmap', {
         height : 660,
         padding : 5,
         projection : d3.geoMercator(),
-        duration : 1000,
+        duration : 2000,
         key:function(d){return d.properties.st_nm; },
         grid : {
           'Andaman and Nicobar Islands': {x:8,y:7, abbr: 'AN'},
@@ -190,8 +190,9 @@ Vue.component('gridmap', {
         g2r.toggle();
         setTimeout(function() {
           d3.selectAll('.label').style('visibility', 'visible');          
-        }, 1000);
+        }, 2000);
         g2r.draw();
+        g2r.config.duration = 1000;
 
       });
 
