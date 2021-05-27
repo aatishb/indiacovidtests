@@ -23,8 +23,8 @@ Vue.component('gridmap', {
           }, 1000);
         } else {
           setTimeout(function() {
-          }, 1000);
             d3.selectAll('.label').style('visibility', 'visible');          
+          }, 1000);
         }
         this.g2r.draw();     
         //console.log(this.g2r.mode);
