@@ -8,10 +8,10 @@ An [interactive website](https://aatishb.com/indiatesttracker/) that lists & vis
 # Data
 The state data is provided by [covid19india.org](https://api.covid19india.org/) and the district data is provided by the Indian [Ministry of Health](https://www.mohfw.gov.in/).
 
-For more details & an archive of the data, visit [this github repository](https://github.com/aatishb/indiatestpositivitydata).
+If you're looking for the raw data behind this visualization, head over to the [data repository](https://github.com/aatishb/indiatestpositivitydata).
 
 # Credits & License
-India Test Tracker is developed by [Aatish Bhatia](https://aatishb.com/). The code for this website is available [here](https://github.com/aatishb/indiatesttracker).
+India Test Tracker is developed by [Aatish Bhatia](https://aatishb.com/). The code is available on [GitHub](https://github.com/aatishb/indiatesttracker).
 
 With thanks to Prasun Mahanti, Manu Prakash, Harsha Devulapalli, and [IndiaCovidSOS](https://www.indiacovidsos.org/) members for feedback & ideas.
 
