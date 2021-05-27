@@ -857,8 +857,8 @@ const State = {
         <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#districts">District Level Data</a></li>
       </ol>
 
-      <h2 id="positivity">Share of Positive Tests in in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-      <p><b>Share of Positive Tests in {{state}} (as of {{lastStateUpdate}}): <span :style="{'color': recentStateData.positivityrate < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{recentStateData.positivityratestring}}</span></b></p>
+      <h2 id="positivity">Share of Positive Tests in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+      <p><b>% Positive Tests in {{state}} (as of {{lastStateUpdate}}): <span :style="{'color': recentStateData.positivityrate < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{recentStateData.positivityratestring}}</span></b></p>
       <p>The <b>Share of Positive Tests</b> is the <b>Weekly Cases</b> divided by the <b>Weekly Tests</b>.</p>
       <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'Share of Positive Tests in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
       <h2 id="cases">Weekly COVID Cases in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
@@ -870,7 +870,7 @@ const State = {
       <br>
 
       <div v-if="districtDataForThisState.length > 0" style="margin-bottom: 1rem;">
-        <h2 id="districts">Share of Positive Tests in {{state}} Districts<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+        <h2 id="districts">% Positive Tests in {{state}} Districts<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
         <table>
           <tr>
             <th class="columntitle" @click="changekey('district')"><b>District</b> <span v-if="key == 'district'">{{(sortorder[key]) ? '▼' : '▲'}}</span></th>
