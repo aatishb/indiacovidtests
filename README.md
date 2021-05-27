@@ -1,3 +1,7 @@
+---
+permalink: /about.html
+---
+
 # India Test Tracker
 An [interactive website](https://aatishb.com/indiatesttracker/) that lists & visualizes COVID testing data provided by the Indian Government.
 
