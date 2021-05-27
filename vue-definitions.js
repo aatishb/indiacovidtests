@@ -783,7 +783,7 @@ Vue.component('graph', {
           .attr("cx", x(d.date))
           .attr("cy", y(d.value))
         focusText
-          .html('Date: ' + d.datestring + '&nbsp;&nbsp;&nbsp;&nbsp;' + (metric  == 'Test Positivity Rate' ? 'Share of Positive Cases' : metric) + ': ' + parseFloat(d.value).toLocaleString())
+          .html('Date: ' + d.datestring + '&nbsp;&nbsp;&nbsp;&nbsp;' + (metric  == 'Test Positivity Rate' ? 'Share of Positive Tests' : metric) + ': ' + parseFloat(d.value).toLocaleString())
           .attr("x", 0)
           .attr("y", height + margin.bottom - 10)
         }
@@ -836,17 +836,27 @@ const State = {
 
       <caveat></caveat>
 
-      <h2>Share of Positive Tests in in {{state}}</h2>
+      <ol style="margin-left: 1rem;">
+        <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#positivity">Share of Positive Tests</a></li>
+        <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#cases">Weekly Cases</a></li>
+        <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#tests">Weekly Tests</a></li>
+        <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#districts">District Level Data</a></li>
+      </ol>
+
+      <h2 id="positivity">Share of Positive Tests in in {{state}}</h2>
+      <p><b>Share of Positive Tests in {{state}} (as of {{lastStateUpdate}}): <span :style="{'color': recentStateData.positivityrate < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{recentStateData.positivityratestring}}</span></b></p>
       <p>The <b>Share of Positive Tests</b> is the <b>Weekly Cases</b> divided by the <b>Weekly Tests</b>.</p>
       <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'Share of Positive Tests in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
-      <h2>Weekly COVID Cases in {{state}}</h2>
+      <h2 id="cases">Weekly COVID Cases in {{state}}</h2>
+      <p><b>Weekly COVID Cases in {{state}} (as of {{lastStateUpdate}}): {{parseFloat(recentStateData.weeklycases).toLocaleString()}}</b></p>
       <graph :data="stateTimeSeries" metric="Weekly Cases" :title="'Weekly COVID Cases in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
-      <h2>Weekly COVID Tests in {{state}}</h2>
+      <h2 id="tests">Weekly COVID Tests in {{state}}</h2>
+      <p><b>Weekly COVID Tests in {{state}} (as of {{lastStateUpdate}}): {{parseFloat(recentStateData.weeklytests).toLocaleString()}}</b></p>
       <graph :data="stateTimeSeries" metric="Weekly Tests" :title="'Weekly COVID Tests in ' + state" stroke="black" fill="rgba(0,255,0,0.2)"></graph>
       <br>
 
       <div v-if="districtDataForThisState.length > 0" style="margin-bottom: 1rem;">
-        <h2>{{state}} Districts with > 10% Share of Positive Tests</h2>
+        <h2 id="districts">Share of Positive Tests in {{state}} Districts</h2>
         <table>
           <tr>
             <th class="columntitle" @click="changekey('district')"><b>District</b> <span v-if="key == 'district'">{{(sortorder[key]) ? '▼' : '▲'}}</span></th>
@@ -854,11 +864,11 @@ const State = {
           </tr>
           <tr v-for="(district,i) in sort(districtDataForThisState, key)" :key="i">
             <td>{{district.district.split(' ').map(e => e[0].toUpperCase() + e.toLowerCase().substr(1)).join(' ')}}</td>
-            <td>{{district.positivityratestring}}</td>
+            <td :style="{'color': district.positivityrate < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{district.positivityratestring}}</td>
           </tr>
         </table>
         <br>
-        <p>Table updated on {{lastUpdate.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}) }}</p>
+        <p>Table updated on {{lastDistrictUpdate}} using data from the <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a></p>
       </div>
 
 
@@ -899,8 +909,13 @@ const State = {
       }));
     },
 
-    stateData() {
+    recentStateData() {
       return this.recentData.filter(e => e.state == this.state)[0];
+    },
+
+    lastStateUpdate() {
+      let [y, m, d] = this.recentStateData.date.split('-');
+      return new Date(y,m - 1,d).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});      
     },
 
     stateTimeSeries() {
@@ -923,9 +938,9 @@ const State = {
       }));
     },
 
-    lastUpdate() {
+    lastDistrictUpdate() {
       let [y, m, d] = this.districtData.slice(-1)[0]['Date'].split('-');
-      return new Date(y,m - 1,d);      
+      return new Date(y,m - 1,d).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});      
     }
 
   },
@@ -1016,6 +1031,7 @@ let app = new Vue({
             changestring: ((100 * (recentTPR - pastTPR)).toFixed(1) + '%').replace('-','−'), //long minus sign     
             weeklycases: stateData.slice(-1)[0]['Weekly Cases'],       
             weeklytests: stateData.slice(-1)[0]['Weekly Tests'],
+            date: stateData.slice(-1)[0]['Date'],
             weeklytestspercapita: weeklytestspercapita,
             weeklytestspercapitastring: (1000 * weeklytestspercapita).toFixed(1)
           });          
