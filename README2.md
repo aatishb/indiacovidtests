@@ -11,9 +11,9 @@ India Test Tracker is developed by [Aatish Bhatia](https://aatishb.com/). The co
 
 With thanks to Prasun Mahanti, Manu Prakash, Harsha Devulapalli, and [IndiaCovidSOS](https://www.indiacovidsos.org/) members for feedback & ideas.
 
-The graphs build on starter code from the [D3.js Graph Gallery](https://www.d3-graph-gallery.com/index.html) by Yan Holtz.
+The charts & graphs build on starter code from the [D3.js Graph Gallery](https://www.d3-graph-gallery.com/index.html) by Yan Holtz.
 
-The tile grid map builds on [this map](https://bl.ocks.org/officeofjane/d33d6ef783993b60b15a3fe0f8da1481) by Jane Pong.
+The map builds on [this map](https://bl.ocks.org/officeofjane/d33d6ef783993b60b15a3fe0f8da1481) by Jane Pong.
 
 This website uses the following javascript libraries:
 
