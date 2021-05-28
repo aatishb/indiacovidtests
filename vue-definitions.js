@@ -135,7 +135,7 @@ Vue.component('gridmap', {
       // Three function that change the tooltip when user hover / move / leave a cell
       var mouseover = function(state) {
         if (state) {
-          tooltip.style("max-height", "7.5rem").html('<b><a href="/' +state.abbreviation+'">'+ state.state + "</a></b><br>% Positive Tests: <b>" + state.positivityratestring 
+          tooltip.style("max-height", "7.5rem").html('<b><a href="' +state.abbreviation+'">'+ state.state + "</a></b><br>% Positive Tests: <b>" + state.positivityratestring 
             + '</b><br>Weekly Change: <b>' + state.changestring
             + '</b><br>Weekly Tests (per 1K people): <b>' + state.weeklytestspercapitastring) + '</b>';
         }
@@ -521,7 +521,7 @@ Vue.component('caveat', {
 
   template: `
   <div id="caveat">
-    ⚠️ COVID testing <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">is</a> <a href="https://science.thewire.in/health/covid-19-poor-testing-in-rural-india-undermines-official-reports-of-case-decline/">extremely</a> <a href="https://www.aljazeera.com/features/2021/5/17/are-these-indias-forgotten-victims-of-covid">limited</a> <a href="https://www.washingtonpost.com/world/2021/05/15/india-coronavirus-rural/">in</a> <a href="https://theprint.in/india/what-happens-when-covid-test-camp-is-held-in-remote-bihar-village-nothing-no-one-turns-up/663842/">rural</a> <a href="https://widerimage.reuters.com/story/death-in-the-himalayas-poverty-fear-stretched-resources-propel-indias-covid-crisis">India</a>, and the actual number of cases in India <a href="https://www.nytimes.com/interactive/2021/05/25/world/asia/india-covid-death-estimates.html">may be <span style="font-size: 1.2rem; vertical-align: -0.1rem;">~</span>20 times higher</a> than the reported numbers. In light of this underreporting, please interpret this data with caution.
+    ⚠️ COVID testing <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">is</a> <a href="https://science.thewire.in/health/covid-19-poor-testing-in-rural-india-undermines-official-reports-of-case-decline/">extremely</a> <a href="https://www.aljazeera.com/features/2021/5/17/are-these-indias-forgotten-victims-of-covid">limited</a> <a href="https://www.washingtonpost.com/world/2021/05/15/india-coronavirus-rural/">in</a> <a href="https://theprint.in/india/what-happens-when-covid-test-camp-is-held-in-remote-bihar-village-nothing-no-one-turns-up/663842/">rural</a> <a href="https://widerimage.reuters.com/story/death-in-the-himalayas-poverty-fear-stretched-resources-propel-indias-covid-crisis">India</a>, and the actual number of cases in India <a href="https://www.nytimes.com/interactive/2021/05/25/world/asia/india-covid-death-estimates.html">may be ~20 times higher</a> than the reported numbers. In light of this underreporting, please interpret this data with caution.
   </div>`
 
 });
