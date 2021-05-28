@@ -1042,7 +1042,7 @@ const routes = [
 // 3. Create the router instance and pass the `routes` option
 const router = new VueRouter({
   mode: 'history',
-  base: '/indiatesttracker/',
+  base: '/indiacovidtests/',
   scrollBehavior (to, from, savedPosition) {
     if (to.hash) {
       return {
