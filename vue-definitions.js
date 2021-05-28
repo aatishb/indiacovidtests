@@ -219,7 +219,7 @@ Vue.component('gridmap', {
 
 Vue.component('chart', {
   
-  props: ['statedata', 'selected'],
+  props: ['statedata', 'selected', 'abbreviations'],
 
   template: '<div id="chart"></div>',
 
@@ -288,10 +288,21 @@ Vue.component('chart', {
         .range([ 0, height ])
         .domain(this.statedata.map(function(d) { return d.state; }))
         .padding(1);
-      svg.append("g")
+      let yaxis = svg.append("g")
         .call(d3.axisLeft(y));
 
-    svg.append("text")
+      let abbreviations = this.abbreviations;
+      
+      let router = this.$router;
+
+      yaxis.selectAll('.tick')
+        .on('click', function (d) {
+          router.push(abbreviations[d]);
+          //console.log(abbreviations[d]);
+        });
+      
+
+      svg.append("text")
         .attr("class", "x label")
         .attr("text-anchor", "middle")
         .attr("x", width/2)
@@ -539,7 +550,7 @@ Vue.component('pagemenu', {
 
 // 1. Define route components.
 const Main = {
-  props: ['recentData'],
+  props: ['recentData', 'abbreviations'],
 
   template: `
   <div>
@@ -595,7 +606,7 @@ const Main = {
         </div>
       </div>
 
-      <chart :statedata="recentData" :selected="selectedChart" class="fullwidth"></chart>
+      <chart :statedata="recentData" :selected="selectedChart" :abbreviations="abbreviations" class="fullwidth"></chart>
 
       <div class="container">
         <p>The numbers in this chart represent a 1 week average. The shaded green region denotes the WHO testing guideline for reopening. <span v-if="showchange">The dark circles indicate current values and light circles indicate values one week ago.</span></p>
