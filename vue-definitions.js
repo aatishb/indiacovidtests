@@ -892,21 +892,21 @@ const State = {
 
 
       <div v-if="stateTimeSeries">
-        <h2 id="positivity">Share of Positive Tests in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-        <p><b>% Positive Tests in {{state}} (as of {{lastStateUpdate}}): <span :style="{'color': parseFloat(recentStateData['Test Positivity Rate']) < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{(100 * parseFloat(recentStateData['Test Positivity Rate'])).toFixed(1) + '%'}}</span></b></p>
+        <h2 id="positivity">Share of Positive Tests Reported By {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+        <p>Percentage of Positive Tests (as of {{lastStateUpdate}}): <b><span :style="{'color': parseFloat(recentStateData['Test Positivity Rate']) < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{(100 * parseFloat(recentStateData['Test Positivity Rate'])).toFixed(1) + '%'}}</span></b></p>
         <p>The <b>Share of Positive Tests</b> is the <b>Weekly Cases</b> divided by the <b>Weekly Tests</b>.</p>
         <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'Share of Positive Tests in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
-        <h2 id="cases">Weekly COVID Cases in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-        <p><b>Weekly COVID Cases in {{state}} (as of {{lastStateUpdate}}): {{parseFloat(recentStateData['Weekly Cases']).toLocaleString()}}</b></p>
+        <h2 id="cases">Weekly COVID Cases Reported By {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+        <p>Weekly COVID Cases (as of {{lastStateUpdate}}): <b>{{parseFloat(recentStateData['Weekly Cases']).toLocaleString()}}</b></p>
         <graph :data="stateTimeSeries" metric="Weekly Cases" :title="'Weekly COVID Cases in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
-        <h2 id="tests">Weekly COVID Tests in {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-        <p><b>Weekly COVID Tests in {{state}} (as of {{lastStateUpdate}}): {{parseFloat(recentStateData['Weekly Tests']).toLocaleString()}}</b></p>
+        <h2 id="tests">Weekly COVID Tests Reported By {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+        <p>Weekly COVID Tests (as of {{lastStateUpdate}}): <b>{{parseFloat(recentStateData['Weekly Tests']).toLocaleString()}}</b></p>
         <graph :data="stateTimeSeries" metric="Weekly Tests" :title="'Weekly COVID Tests in ' + state" stroke="black" fill="rgba(0,255,0,0.2)"></graph>
         <br>
       </div>
 
       <div v-if="districtDataForThisState.length > 0" style="margin-bottom: 1rem;">
-        <h2 id="districts">% Positive Tests in {{state}} Districts<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+        <h2 id="districts">% Positive Tests Reported By {{state}} Districts<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
         <table>
           <tr>
             <th class="columntitle" @click="changekey('district')"><b>District</b> <span v-if="key == 'district'">{{(sortorder[key]) ? '▼' : '▲'}}</span></th>
@@ -918,7 +918,7 @@ const State = {
           </tr>
         </table>
         <br>
-        <p>Table updated on {{lastDistrictUpdate}} using data from the <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a></p>
+        <p>Table updated on {{lastDistrictUpdate}} using data reported by {{state}} to the <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a></p>
       </div>
 
 
