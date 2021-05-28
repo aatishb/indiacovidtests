@@ -27,7 +27,6 @@ Vue.component('gridmap', {
           }, 1000);
         }
         this.g2r.draw();     
-        //console.log(this.g2r.mode);
     },
 
     drawMap() {
@@ -219,7 +218,7 @@ Vue.component('gridmap', {
 
 Vue.component('chart', {
   
-  props: ['statedata', 'selected'],
+  props: ['statedata', 'selected', 'abbreviations'],
 
   template: '<div id="chart"></div>',
 
@@ -288,10 +287,23 @@ Vue.component('chart', {
         .range([ 0, height ])
         .domain(this.statedata.map(function(d) { return d.state; }))
         .padding(1);
-      svg.append("g")
+
+      let yaxis = svg.append("g")
         .call(d3.axisLeft(y));
 
-    svg.append("text")
+      let abbreviations = this.abbreviations;
+      
+      let router = this.$router;
+
+      yaxis.selectAll('text').attr('fill', '#0070dd');
+
+      yaxis.selectAll('.tick')
+        .on('click', function (d) {
+          router.push(abbreviations[d]);
+        });
+      
+
+      svg.append("text")
         .attr("class", "x label")
         .attr("text-anchor", "middle")
         .attr("x", width/2)
@@ -497,12 +509,12 @@ Vue.component('caveat', {
   data() {
     return {
       blurb: `
-      India's COVID cases are underreported by a factor of 15 to 26, according to a <a href="https://www.nytimes.com/interactive/2021/05/25/world/asia/india-covid-death-estimates.html">New York Times</a> analysis.
+      COVID cases in India are underreported by a factor of 15 to 26, according to an <a href="https://www.nytimes.com/interactive/2021/05/25/world/asia/india-covid-death-estimates.html">NYT</a> analysis.
       `,
       rest: `
       There is a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe</a> <a href="https://science.thewire.in/health/covid-19-poor-testing-in-rural-india-undermines-official-reports-of-case-decline/">shortage</a> <a href="https://www.aljazeera.com/features/2021/5/17/are-these-indias-forgotten-victims-of-covid">of</a> <a href="https://www.washingtonpost.com/world/2021/05/15/india-coronavirus-rural/">testing</a> in rural India, and very high <a href="https://theprint.in/india/what-happens-when-covid-test-camp-is-held-in-remote-bihar-village-nothing-no-one-turns-up/663842/">testing</a> <a href="https://widerimage.reuters.com/story/death-in-the-himalayas-poverty-fear-stretched-resources-propel-indias-covid-crisis">hesitancy</a>. 
-      States also differ a lot in the accuracy, methodology, and level of testing.
-      Because testing data is severely underreported, please interpret this data with caution.
+      States also differ in the accuracy, methodology, and level of testing.
+      Because testing data is underreported, please interpret this data with caution.
       Decisions about reopenings should not rely on testing alone, and should take into account <a href="https://apps.who.int/iris/handle/10665/332073">other measures</a> of community spread.`,
       expand: false,
     };
@@ -539,7 +551,7 @@ Vue.component('pagemenu', {
 
 // 1. Define route components.
 const Main = {
-  props: ['recentData'],
+  props: ['recentData', 'abbreviations'],
 
   template: `
   <div>
@@ -595,7 +607,7 @@ const Main = {
         </div>
       </div>
 
-      <chart :statedata="recentData" :selected="selectedChart" class="fullwidth"></chart>
+      <chart :statedata="recentData" :selected="selectedChart" :abbreviations="abbreviations" class="fullwidth"></chart>
 
       <div class="container">
         <p>The numbers in this chart represent a 1 week average. The shaded green region denotes the WHO testing guideline for reopening. <span v-if="showchange">The dark circles indicate current values and light circles indicate values one week ago.</span></p>
@@ -813,7 +825,6 @@ Vue.component('graph', {
   },
 
   mounted() {
-    //console.log(this.data.map(e => [e['Date'], e[this.metric]]));
     this.drawGraph();
   },
 
@@ -965,7 +976,6 @@ const State = {
 
   methods: {
     changeState() {
-      //console.log('selected state: ', this.selectedState, this.abbreviations[this.selectedState]);
       this.$router.push(this.abbreviations[this.selectedState]);
     },
 
