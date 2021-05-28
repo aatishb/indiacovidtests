@@ -503,7 +503,7 @@ Vue.component('caveat', {
       There is a <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">severe</a> <a href="https://science.thewire.in/health/covid-19-poor-testing-in-rural-india-undermines-official-reports-of-case-decline/">shortage</a> <a href="https://www.aljazeera.com/features/2021/5/17/are-these-indias-forgotten-victims-of-covid">of</a> <a href="https://www.washingtonpost.com/world/2021/05/15/india-coronavirus-rural/">testing</a> in rural India, and very high <a href="https://theprint.in/india/what-happens-when-covid-test-camp-is-held-in-remote-bihar-village-nothing-no-one-turns-up/663842/">testing</a> <a href="https://widerimage.reuters.com/story/death-in-the-himalayas-poverty-fear-stretched-resources-propel-indias-covid-crisis">hesitancy</a>. 
       States also differ a lot in the accuracy, methodology, and level of testing.
       Because testing data is severely underreported, please interpret this data with caution.
-      Decisions about reopenings should rely on testing alone, and should take into account <a href="https://apps.who.int/iris/handle/10665/332073">other measures</a> of community spread.`,
+      Decisions about reopenings should NOT rely on testing alone, and should take into account <a href="https://apps.who.int/iris/handle/10665/332073">other measures</a> of community spread.`,
       expand: false,
     };
   }
