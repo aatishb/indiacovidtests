@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>India Test Tracker</title>
+  <title>India Covid Tests</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Track & Visualize India's COVID Testing Data.">
+  <meta name="description" content="Visualizing India's COVID Testing Data">
   <script src="libraries/vue.min.js"></script>
   <script src="libraries/vue-router.min.js"></script>
   <script src="libraries/d3.v4.min.js"></script>
@@ -20,8 +20,8 @@
   <div id="root">
 
     <header>
-      <div><router-link to="/"><span style="letter-spacing: -6.5px;">▲</span>▼ India Test Tracker</router-link></div>
-      <div><a href="https://aatishb.com/indiatesttracker/about.html">About</a></div>
+      <div><router-link to="/"><span style="letter-spacing: -6.5px;">▲</span>▼ India Covid Tests</router-link></div>
+      <div><a href="https://aatishb.com/indiacovidtests/about.html">About</a></div>
     </header>
 
     <router-view :recent-data="recentData" :all-data="allData" :abbreviations="abbreviations" :district-data="districtData"></router-view>
@@ -34,9 +34,9 @@
         <p id="methodology">
           Data: <a href="https://api.covid19india.org/">covid19india.org</a> (states), <a href="https://www.mohfw.gov.in/">Ministry of Health</a> (districts)
           <span style="font-weight: 700">&middot;</span>
-          This website is <a href="https://github.com/aatishb/indiatesttracker">open source</a>
+          This website is <a href="https://github.com/aatishb/indiacovidtests">open source</a>
           <span style="font-weight: 700">&middot;</span>
-          <a href="https://github.com/aatishb/indiatesttracker/issues/new/choose">Improve this page</a>
+          <a href="https://github.com/aatishb/indiacovidtests/issues/new/choose">Improve this page</a>
           <span style="font-weight: 700">&middot;</span>
           <a href="https://github.com/aatishb/indiatestpositivitydata">Data Archive</a>
         </p>
