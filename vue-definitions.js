@@ -27,7 +27,6 @@ Vue.component('gridmap', {
           }, 1000);
         }
         this.g2r.draw();     
-        //console.log(this.g2r.mode);
     },
 
     drawMap() {
@@ -301,7 +300,6 @@ Vue.component('chart', {
       yaxis.selectAll('.tick')
         .on('click', function (d) {
           router.push(abbreviations[d]);
-          //console.log(abbreviations[d]);
         });
       
 
@@ -827,7 +825,6 @@ Vue.component('graph', {
   },
 
   mounted() {
-    //console.log(this.data.map(e => [e['Date'], e[this.metric]]));
     this.drawGraph();
   },
 
@@ -979,7 +976,6 @@ const State = {
 
   methods: {
     changeState() {
-      //console.log('selected state: ', this.selectedState, this.abbreviations[this.selectedState]);
       this.$router.push(this.abbreviations[this.selectedState]);
     },
 
