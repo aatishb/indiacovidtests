@@ -70,7 +70,6 @@ footer a {
   padding: 0.75rem;
   background-color: rgb(255,237,237);
   color: crimson;
-  font-weight: 600;
   overflow: hidden;
   margin-bottom: 1rem;
   text-align: justify;
@@ -79,14 +78,10 @@ footer a {
   -moz-transition: max-height 0.2s ease-in;
 }
 
-#caveat a {
-}
-
 p {
   margin-bottom:1rem;
   text-align: justify;  
 }
-
 
 button {
   font-size: 1rem;

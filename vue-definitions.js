@@ -8,7 +8,7 @@ Vue.component('gridmap', {
     <div id="blurb"></div>
     <div id="map"></div>
     <div style="display: flex; flex-direction: row; justify-content: center;">
-      <button v-if="g2r !== null" @click="toggle" style="margin-bottom: 1rem;">Show {{g2r.mode == 'geo' ? 'Grid' : 'Map'}}</button>
+      <button v-if="g2r !== null" @click="toggle" style="margin-bottom: 1rem;">Switch To {{g2r.mode == 'geo' ? 'Grid' : 'Map'}}</button>
     </div>
   </div>
   `,
@@ -17,13 +17,13 @@ Vue.component('gridmap', {
     toggle() { // todo: debounce
         this.g2r.toggle();
         if (this.g2r.mode == 'geo') {
-          d3.selectAll('.label').style('visibility', 'hidden');
+          d3.selectAll('.textlabel').style('visibility', 'hidden');
           setTimeout(function() {
-            d3.selectAll('.label').style('visibility', 'hidden');          
+            d3.selectAll('.textlabel').style('visibility', 'hidden');          
           }, 1000);
         } else {
           setTimeout(function() {
-            d3.selectAll('.label').style('visibility', 'visible');          
+            d3.selectAll('.textlabel').style('visibility', 'visible');          
           }, 1000);
         }
         this.g2r.draw();     
@@ -119,8 +119,12 @@ Vue.component('gridmap', {
         .style('border','2px solid rgb(40, 20, 70)')
         .style('color','rgb(40, 20, 70)')
         .style('background-color','lightgoldenrodyellow')
+        .style('max-width', '26rem')
+        .style('text-align', 'center')
         .style("padding", "0.75rem")
         .style("margin-top", "1rem")
+        .style("margin-left", "auto")
+        .style("margin-right", "auto")
         .style("max-height", "3rem")
         .style('transition', 'max-height 0.2s ease-in')
         .style('-webkit-transition', 'max-height 0.2s ease-in')
@@ -131,7 +135,7 @@ Vue.component('gridmap', {
       // Three function that change the tooltip when user hover / move / leave a cell
       var mouseover = function(state) {
         if (state) {
-          tooltip.style("max-height", "7.5rem").html('<b>' + state.state + "</b><br>% Positive Tests: <b>" + state.positivityratestring 
+          tooltip.style("max-height", "7.5rem").html('<b><a href="/' +state.abbreviation+'">'+ state.state + "</a></b><br>% Positive Tests: <b>" + state.positivityratestring 
             + '</b><br>Weekly Change: <b>' + state.changestring
             + '</b><br>Weekly Tests (per 1K people): <b>' + state.weeklytestspercapitastring) + '</b>';
         }
@@ -141,7 +145,23 @@ Vue.component('gridmap', {
 
       // colour scale
       var colors = d3.scaleQuantile()
+        .domain([0,0.35])
         .range(['#ffffe0','#ffd59b','#ffa474','#f47461','#db4551','#b81b34','#8b0000']);
+
+      let legendSvg = svg.append("g")
+        .attr("class", "legendQuant")
+        .attr("fill", 'black')
+        .attr("stroke", 'none')
+        .attr("transform", "translate(" + String(0.66 * width) + ","+ String(0.7 * height) +")");
+
+      var legend = d3.legendColor()
+        .labelFormat(d3.format(".0%"))
+        .labels(d3.legendHelpers.thresholdLabels)
+        .scale(colors);
+
+      legendSvg.call(legend);
+
+      d3.selectAll('rect').attr("stroke", 'black');
 
       let g2r = new geo2rect.draw();
       this.g2r = g2r;
@@ -157,8 +177,6 @@ Vue.component('gridmap', {
 
         g2r.draw();
 
-        colors.domain([0,0.35]);
-
         statedata.forEach(function(d) {
           d3.selectAll("svg .id-" + d.state.replaceAll(' ', '.'))
             .style("fill", colors(d.positivityrate))
@@ -172,7 +190,7 @@ Vue.component('gridmap', {
           let data = statedata.filter(e => e.state == d)[0];
 
           svg.append("text")
-              .attr("class", "label")
+              .attr("class", "textlabel")
               .attr("text-anchor", "middle")
               .attr("x", x(state.x))
               .attr("y", y(1 + state.y))
@@ -188,7 +206,7 @@ Vue.component('gridmap', {
 
         g2r.toggle();
         setTimeout(function() {
-          d3.selectAll('.label').style('visibility', 'visible');          
+          d3.selectAll('.textlabel').style('visibility', 'visible');          
         }, 2000);
         g2r.draw();
         g2r.config.duration = 1000;
@@ -503,7 +521,7 @@ Vue.component('caveat', {
 
   template: `
   <div id="caveat">
-    ⚠️ COVID cases in India are <span style="font-size: 1.2rem; vertical-align: -0.1rem;">~</span>20 times higher than the reported numbers, according to a <a href="https://www.nytimes.com/interactive/2021/05/25/world/asia/india-covid-death-estimates.html">New York Times</a> analysis. Testing <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">is</a> <a href="https://science.thewire.in/health/covid-19-poor-testing-in-rural-india-undermines-official-reports-of-case-decline/">extremely</a> <a href="https://www.aljazeera.com/features/2021/5/17/are-these-indias-forgotten-victims-of-covid">limited</a> <a href="https://www.washingtonpost.com/world/2021/05/15/india-coronavirus-rural/">in</a> <a href="https://theprint.in/india/what-happens-when-covid-test-camp-is-held-in-remote-bihar-village-nothing-no-one-turns-up/663842/">rural</a> <a href="https://widerimage.reuters.com/story/death-in-the-himalayas-poverty-fear-stretched-resources-propel-indias-covid-crisis">India</a>. In light of this severe underreporting, please interpret this data with caution.
+    ⚠️ COVID testing <a href="https://www.npr.org/2021/05/22/998489469/in-rural-india-less-covid-19-testing-more-fear-and-a-few-ventilators-for-million">is</a> <a href="https://science.thewire.in/health/covid-19-poor-testing-in-rural-india-undermines-official-reports-of-case-decline/">extremely</a> <a href="https://www.aljazeera.com/features/2021/5/17/are-these-indias-forgotten-victims-of-covid">limited</a> <a href="https://www.washingtonpost.com/world/2021/05/15/india-coronavirus-rural/">in</a> <a href="https://theprint.in/india/what-happens-when-covid-test-camp-is-held-in-remote-bihar-village-nothing-no-one-turns-up/663842/">rural</a> <a href="https://widerimage.reuters.com/story/death-in-the-himalayas-poverty-fear-stretched-resources-propel-indias-covid-crisis">India</a>, and the actual number of cases in India <a href="https://www.nytimes.com/interactive/2021/05/25/world/asia/india-covid-death-estimates.html">may be <span style="font-size: 1.2rem; vertical-align: -0.1rem;">~</span>20 times higher</a> than the reported numbers. In light of this underreporting, please interpret this data with caution.
   </div>`
 
 });
@@ -595,8 +613,25 @@ const Main = {
 
       <chart :statedata="recentData" :selected="selectedChart" :abbreviations="abbreviations" class="fullwidth"></chart>
 
-      <div class="container">
-        <p>The numbers in this chart represent a 1 week average. The shaded green region denotes the WHO testing guideline for reopening. <span v-if="showchange">The dark circles indicate current values and light circles indicate values one week ago.</span></p>
+      <div class="container" style="display: flex; flex-direction: column; align-items: center;">
+
+        <div style="border: 2px solid rgb(40, 20, 70); color: rgb(40, 20, 70); background-color: lightgoldenrodyellow; padding-left: 0.75rem;  padding-right: 0.75rem; width: 66%">
+          <ul>
+            <li>👉🏽 Click on State Label for More Information</li>
+            <li>👉🏽 Use Dropdown Menu to Change Chart</li>
+          </ul>
+        </div>
+
+        <p style="padding-top:1rem;">The numbers in this chart represent a 1 week average. The shaded green region denotes the WHO testing guideline for reopening. <span v-if="showchange">The dark circles indicate current values and light circles indicate values one week ago.</span></p>
+
+        <div style="display: flex; flex-direction: row; justify-content: center;">
+          <select v-model="selectedChart">
+            <option v-for="option in options" v-bind:value="option.value">
+              {{ option.text }}
+            </option>
+          </select>
+        </div>
+
       </div>
 
     </div>
