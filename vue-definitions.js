@@ -555,7 +555,7 @@ Vue.component('pagemenu', {
 
 // 1. Define route components.
 const Main = {
-  props: ['recentData', 'abbreviations'],
+  props: ['recentData', 'allData', 'abbreviations', 'districtData'],
 
   template: `
   <div>
