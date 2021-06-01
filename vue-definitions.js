@@ -1,3 +1,82 @@
+Vue.component('statemap', {
+
+  props: ['state'],
+
+  template: `<div id="statemap"></div>`,
+
+  methods: {
+    drawMap() {
+
+      if (this.state) {
+
+        //Define map projection
+        var projection = d3.geoMercator()
+                .scale(1)
+                .translate([0, 0]);
+
+        //Define path generator
+        var path = d3.geoPath().projection(projection);
+
+        // set the dimensions and margins of the map
+        var margin = {top: 0, right: 0, bottom: 0, left: 0},
+            width = 660,
+            height = 440;
+
+        d3.selectAll("#statemap").selectAll("svg").remove();
+
+        var svg = d3.select("#statemap")
+          .append("svg")
+            .attr("viewBox", '0 0 ' + String(width + margin.left + margin.right) + ' ' + String(height + margin.top + margin.bottom))
+            .style('fill','transparent')
+            .style('stroke', 'rgb(0,0,51)')
+            .style('background-color', 'pink');
+
+        let statename = this.state;
+
+        //Load in GeoJSON data
+        d3.json("../maps/IndianDistrictsTopoJSON.json", function(topology) {
+
+            let state = topojson.feature(topology, topology.objects[statename.toLowerCase().replaceAll(' and ',' ').replaceAll(' ', '') + '_district']);
+
+            // Calculate bounding box transforms for entire collection
+            var b = path.bounds( state ),
+            s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
+            t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+
+            // Update the projection    
+            projection
+                  .scale(s)
+                  .translate(t);
+
+            //Bind data and create one path per GeoJSON feature
+            svg.selectAll("path")
+               .data(state.features)
+               .enter()
+               .append("path")
+               .attr("d", path)
+               .style("stroke", "black")
+               .style("fill", "none");
+
+        });
+
+
+      }
+
+    }
+  },
+
+  watch: {
+    state() {
+      this.drawMap();
+    }
+  },
+
+
+  mounted() {
+    this.drawMap();
+  }
+});
+
 // map code adapted from https://bl.ocks.org/officeofjane/d33d6ef783993b60b15a3fe0f8da1481
 
 Vue.component('gridmap', {
@@ -166,7 +245,7 @@ Vue.component('gridmap', {
       let g2r = new geo2rect.draw();
       this.g2r = g2r;
 
-      d3.json('india.geojson', function(err, data){
+      d3.json('maps/india.geojson', function(err, data){
         var geojson = geo2rect.compute(data);
 
         g2r.config = config;
@@ -920,6 +999,8 @@ const State = {
         <br>
         <p>Table updated on {{lastDistrictUpdate}} using data reported by {{state}} to the <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a></p>
       </div>
+
+      <statemap :state="selectedState"></statemap>
 
 
       <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
