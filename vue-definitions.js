@@ -2,7 +2,11 @@ Vue.component('statemap', {
 
   props: ['state'],
 
-  template: `<div id="statemap"></div>`,
+  template: `
+  <div>
+    <div id="blurb"></div>
+    <div id="statemap"></div>
+  </div>`,
 
   methods: {
     drawMap() {
@@ -28,8 +32,7 @@ Vue.component('statemap', {
           .append("svg")
             .attr("viewBox", '0 0 ' + String(width + margin.left + margin.right) + ' ' + String(height + margin.top + margin.bottom))
             .style('fill','transparent')
-            .style('stroke', 'rgb(0,0,51)')
-            .style('background-color', 'pink');
+            .style('stroke', 'rgb(0,0,51)');
 
         let statename = this.state;
 
@@ -634,7 +637,7 @@ Vue.component('pagemenu', {
 
 // 1. Define route components.
 const Main = {
-  props: ['recentData', 'allData', 'abbreviations', 'districtData'],
+  props: ['recentData', 'allData', 'abbreviations', 'districtData', 'lastUpdatedDistrict'],
 
   template: `
   <div>
@@ -940,7 +943,7 @@ Vue.component('graph', {
 
 
 const State = { 
-  props: ['recentData', 'allData', 'abbreviations', 'districtData'],
+  props: ['recentData', 'allData', 'abbreviations', 'districtData', 'lastUpdatedDistrict'],
 
   template: `
   <div>
@@ -985,22 +988,42 @@ const State = {
       </div>
 
       <div v-if="districtDataForThisState.length > 0" style="margin-bottom: 1rem;">
+
         <h2 id="districts">% Positive Tests Reported By {{state}} Districts<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-        <table>
-          <tr>
-            <th class="columntitle" @click="changekey('district')"><b>District</b> <span v-if="key == 'district'">{{(sortorder[key]) ? '▼' : '▲'}}</span></th>
-            <th class="columntitle" @click="changekey('positivityrate')"><b>% Positive Tests</b> <span v-if="key == 'positivityrate'">{{(sortorder[key]) ? '▼' : '▲'}}</span> <br><span class="light">(6 day average)</span></th>
-          </tr>
-          <tr v-for="(district,i) in sort(districtDataForThisState, key)" :key="i">
-            <td>{{district.district}}</td>
-            <td :style="{'color': district.positivityrate < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{district.positivityratestring}}</td>
-          </tr>
-        </table>
+
+        <pagemenu v-bind:view-mode.sync="viewMode"></pagemenu>
+
+        <div v-if="viewMode == 'table'">
+          <table>
+            <tr>
+              <th class="columntitle" @click="changekey('district')"><b>District</b> <span v-if="key == 'district'">{{(sortorder[key]) ? '▼' : '▲'}}</span></th>
+              <th class="columntitle" @click="changekey('positivityrate')"><b>% Positive Tests</b> <span v-if="key == 'positivityrate'">{{(sortorder[key]) ? '▼' : '▲'}}</span> <br><span class="light">(1 week average)</span></th>
+              <th class="columntitle" @click="changekey('change')"><b>Trend</b> <span v-if="key == 'change'">{{(sortorder[key]) ? '▼' : '▲'}}</span> <br><span class="light">(1 week change)</span></th>
+            </tr>
+            <tr v-for="(district,i) in sort(districtDataForThisState, key)" :key="i">
+              <td>{{district.district}}</td>
+              <td :style="{'color': district.positivityrate < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{district.positivityratestring}}</td>
+              <td>
+                <span :style="{color: district.change > 0 ? 'crimson' : 'rgb(70, 130, 65)'}" v-if="Math.round(Math.abs(100*district.change)) > 0">
+                  <b>{{district.change > 0 ? '▲' : '▼'}}</b> {{district.changestring}}
+                </span>
+                <span v-else><span style="vertical-align: -0.25rem; super; font-size: 1.75rem;">≈</span> {{district.changestring}}</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div v-if="viewMode == 'map'">
+          <statemap :state="selectedState"></statemap>
+        </div>
+
         <br>
-        <p>Table updated on {{lastDistrictUpdate}} using data reported by {{state}} to the <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a></p>
+        <p>District data updated on {{lastUpdatedDistrict}} using data reported by {{state}} to the <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a></p>
+
+        <pagemenu v-bind:view-mode.sync="viewMode"></pagemenu>
+
       </div>
 
-      <statemap :state="selectedState"></statemap>
 
 
       <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
@@ -1062,17 +1085,8 @@ const State = {
     },
 
     districtDataForThisState() {
-      return this.districtData.filter(e => e['State'] == this.state.toUpperCase()).map(e => ({
-        district: e['District'].split(' ').filter(e => e.length > 0).map(e => e.includes('.') ? e : e[0].toUpperCase() + e.toLowerCase().substr(1)).join(' '),
-        positivityrate: parseFloat(e['Test Positivity Rate']),
-        positivityratestring: (100 * parseFloat(e['Test Positivity Rate'])).toFixed(1) + '%',
-      }));
+      return this.districtData.filter(e => e.state == this.state);
     },
-
-    lastDistrictUpdate() {
-      let [y, m, d] = this.districtData.slice(-1)[0]['Date'].split('-');
-      return new Date(y,m - 1,d).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});      
-    }
 
   },
 
@@ -1103,11 +1117,13 @@ const State = {
   },
   data() {
     return {
+      viewMode: 'table',
       selectedState: '',
       key: 'positivityrate',
       sortorder: {
         'district': false,
         'positivityrate': true,
+        'change': false,
       }
     }
   }
@@ -1188,9 +1204,30 @@ let app = new Vue({
       let [y, m, d] = lastUpdate.split('-');
       this.lastUpdatedDistrict = new Date(y,m - 1,d);
 
-      let districtData = data.filter(e => e['Date'] == lastUpdate);
+      let lookback = 6; // change to 7
+      let recentData = [];
 
-      this.districtData = districtData;
+      for (let state of this.states) {
+        let stateData = data.filter(e => e['State'] == state.toUpperCase());
+        let districts = stateData.filter(e => e['Date'] == lastUpdate).map(e => e['District']);
+        for (let district of districts) {
+          let districtData = stateData.filter(e => e['District'] == district);
+          let recentTPR = parseFloat(districtData.slice(-1)[0]['Test Positivity Rate']);
+          let pastTPR = parseFloat(districtData.slice(-lookback-1,-lookback)[0]['Test Positivity Rate']);
+
+          recentData.push({
+            state: state,
+            district: district.split(' ').filter(e => e.length > 0).map(e => e.includes('.') ? e : e[0].toUpperCase() + e.toLowerCase().substr(1)).join(' '),
+            positivityrate: recentTPR,
+            positivityratestring: (100 * recentTPR).toFixed(1) + '%',
+            pastpositivityrate: pastTPR,
+            change: recentTPR - pastTPR,
+            changestring: ((100 * (recentTPR - pastTPR)).toFixed(1) + '%').replace('-','−'), //long minus sign     
+          });
+        }
+      }
+
+      this.districtData = recentData;
 
     });
 
@@ -1282,6 +1319,7 @@ let app = new Vue({
     recentData: [],
     districtData: [],
     lastUpdated: new Date(),
+    lastUpdatedDistrict: new Date(),
   }
 
 });
