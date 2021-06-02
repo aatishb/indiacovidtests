@@ -1048,7 +1048,7 @@ const State = {
 
       <div v-if="viewMode == 'chart'">
 
-        <div class="container">
+        <div class="container" v-if="districtDataForThisState.length > 2">
           <div style="display: flex; flex-direction: row; justify-content: center;">
             <select v-model="selectedChart">
               <option v-for="option in options" v-bind:value="option.value">
@@ -1060,9 +1060,20 @@ const State = {
 
         <chart :statedata="districtDataForThisState" :selected="selectedChart" :state="state" class="fullwidth"></chart>
 
+        <div class="container">
+          <div style="display: flex; flex-direction: row; justify-content: center;">
+            <select v-model="selectedChart">
+              <option v-for="option in options" v-bind:value="option.value">
+                {{ option.text }}
+              </option>
+            </select>
+          </div>
+        </div>
+
       </div>
 
       <div class="container">
+        <br>
         <p>District data updated on {{lastUpdatedDistrict}} using data reported by {{state}} to the <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a></p>
         <pagemenu v-bind:view-mode.sync="viewMode"></pagemenu>
       </div>
