@@ -756,12 +756,6 @@ Vue.component('chart', {
       this.drawChart();
     },
 
-  },
-
-  data() {
-    return {
-      mounted: false
-    }
   }
 
 });
