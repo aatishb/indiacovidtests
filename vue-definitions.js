@@ -996,7 +996,7 @@ const State = {
       </ol>
 
 
-      <div v-if="stateTimeSeries">
+      <div v-if="recentStateData">
         <h2 id="positivity">Share of Positive Tests Reported By {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
         <p>Percentage of Positive Tests (as of {{lastStateUpdate}}): <b><span :style="{'color': parseFloat(recentStateData['Test Positivity Rate']) < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{(100 * parseFloat(recentStateData['Test Positivity Rate'])).toFixed(1) + '%'}}</span></b></p>
         <p>The <b>Share of Positive Tests</b> is the <b>Weekly Cases</b> divided by the <b>Weekly Tests</b>.</p>
@@ -1042,31 +1042,31 @@ const State = {
 
       </div>
 
-    </div>
-
-    <div v-if="viewMode == 'map'">
-      <statemap :state="selectedState" class="fullwidth"></statemap>
-    </div>
-
-    <div v-if="viewMode == 'chart'">
-
-      <div class="container">
-        <div style="display: flex; flex-direction: row; justify-content: center;">
-          <select v-model="selectedChart">
-            <option v-for="option in options" v-bind:value="option.value">
-              {{ option.text }}
-            </option>
-          </select>
-        </div>
+      <div v-if="viewMode == 'map'">
+        <statemap :state="selectedState" class="fullwidth"></statemap>
       </div>
 
-      <chart :statedata="districtDataForThisState" :selected="selectedChart" :state="state" class="fullwidth"></chart>
+      <div v-if="viewMode == 'chart'">
 
-    </div>
+        <div class="container">
+          <div style="display: flex; flex-direction: row; justify-content: center;">
+            <select v-model="selectedChart">
+              <option v-for="option in options" v-bind:value="option.value">
+                {{ option.text }}
+              </option>
+            </select>
+          </div>
+        </div>
 
-    <div class="container">
-      <p>District data updated on {{lastUpdatedDistrict}} using data reported by {{state}} to the <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a></p>
-      <pagemenu v-bind:view-mode.sync="viewMode"></pagemenu>
+        <chart :statedata="districtDataForThisState" :selected="selectedChart" :state="state" class="fullwidth"></chart>
+
+      </div>
+
+      <div class="container">
+        <p>District data updated on {{lastUpdatedDistrict}} using data reported by {{state}} to the <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a></p>
+        <pagemenu v-bind:view-mode.sync="viewMode"></pagemenu>
+      </div>
+
     </div>
 
     <div class="container">
@@ -1162,7 +1162,7 @@ const State = {
   },
   data() {
     return {
-      viewMode: 'table',
+      viewMode: 'chart',
       selectedState: '',
       key: 'positivityrate',
       sortorder: {
@@ -1170,7 +1170,7 @@ const State = {
         'positivityrate': true,
         'change': false,
       },
-      selectedChart: 'positivityrate',
+      selectedChart: 'change',
       options: [
         { text: 'Percentage of Positive Tests', value: 'positivityrate' },
         { text: 'Trend (1 week change)', value: 'change' },
