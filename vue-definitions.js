@@ -106,7 +106,7 @@ Vue.component('statemap', {
       let stringify = this.stringify;
 
       //Load in GeoJSON data
-      d3.json("../maps/IndianDistrictsTopoJSON.json", function(topology) {
+      d3.json("https://aatishb.com/indiacovidtests/maps/IndianDistrictsTopoJSON.json", function(topology) {
 
           let state = topojson.feature(topology, topology.objects[statename.toLowerCase().replaceAll(' and ',' ').replaceAll(' ', '') + '_district']);
 
