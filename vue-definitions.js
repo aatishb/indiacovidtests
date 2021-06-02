@@ -53,9 +53,9 @@ Vue.component('statemap', {
         var path = d3.geoPath().projection(projection);
 
         // set the dimensions and margins of the map
-        var margin = {top: 60, right: 0, bottom: 0, left: 0},
-            width = 600 - margin.left - margin.right,
-            height = 600 - margin.top - margin.bottom;
+        var margin = {top: 60, right: 150, bottom: 0, left: 0},
+            width = 700 - margin.left - margin.right,
+            height = 700 - margin.top - margin.bottom;
 
         d3.selectAll("#statemap").selectAll("svg").remove();
 
@@ -71,7 +71,7 @@ Vue.component('statemap', {
         svg.append("text")
             .attr("class", "title")
             .attr("text-anchor", "middle")
-            .attr("x", width/2)
+            .attr("x", (margin.left + width + margin.right)/2)
             .attr("y", -margin.top/4)
             .text("What Percentage of COVID Tests are Positive in " + this.abbreviation + "?")
             .style('fill', 'rgb(0,0,51)')
@@ -84,6 +84,21 @@ Vue.component('statemap', {
       var colors = d3.scaleQuantile()
         .domain([0,0.35])
         .range(['#ffffe0','#ffd59b','#ffa474','#f47461','#db4551','#b81b34','#8b0000']);
+
+
+      let legendSvg = svg.append("g")
+        .attr("class", "legendQuant")
+        .attr("fill", 'black')
+        .attr("stroke", 'none')
+        .attr("transform", "translate(" + String(width) + ","+ String(height * 0.33) +")");
+
+      var legend = d3.legendColor()
+        .labelFormat(d3.format(".0%"))
+        .labels(d3.legendHelpers.thresholdLabels)
+        .scale(colors);
+
+      legendSvg.call(legend);
+
 
       let statename = this.state;
       let statedata = this.statedata;
@@ -882,7 +897,7 @@ const Main = {
 
         <h2>States reporting numbers <span style="color:rgb(18,136,18);">that meet</span> WHO guidelines<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup>:  <span style="color:rgb(18,136,18);">{{statesWithLowPositivity.length}}</span></h2>
 
-        <statetable :statedata="statesWithLowPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend"></statetable>
+        <statetable :statedata="statesWithLowPositivity" :showtestnumbers="showtestnumbers" :showtrend="showtrend" class="fullwidth"></statetable>
 
         <br>
         <h2>States reporting numbers <span style="color:crimson;">that don't meet</span> WHO guidelines<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup>: <span style="color:crimson;">{{statesWithHighPositivity.length}}</span></h2>
