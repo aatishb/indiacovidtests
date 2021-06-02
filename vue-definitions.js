@@ -318,7 +318,7 @@ Vue.component('gridmap', {
 
 Vue.component('chart', {
   
-  props: ['statedata', 'selected', 'abbreviations'],
+  props: ['statedata', 'selected', 'abbreviations', 'state'],
 
   template: '<div id="chart"></div>',
 
@@ -343,13 +343,15 @@ Vue.component('chart', {
 
       let data = this.selected == 'weeklytestspercapita' ? this.statedata.sort((a,b) => parseFloat(b.weeklytestspercapita) - parseFloat(a.weeklytestspercapita)) : this.statedata.sort((a,b) => parseFloat(b.positivityrate) - parseFloat(a.positivityrate));
 
+      let numStates = this.statedata.length;
+
 
       // set the dimensions and margins of the chart
       var margin = {top: 50, right: 30, bottom: 10, left: 150},
           width = 500 - margin.left - margin.right,
-          height = 800 - margin.top - margin.bottom;
+          height = numStates*720/34 + 80 - margin.top - margin.bottom;
 
-      d3.selectAll("svg").remove();
+      d3.selectAll("#chart").selectAll("svg").remove();
 
       var svg = d3.select("#chart")
         .append("svg")
@@ -368,9 +370,15 @@ Vue.component('chart', {
             .attr("transform", "translate(0,0)")
             .call(d3.axisTop(x));
         } else {
-          svg.append("g")
-            .attr("transform", "translate(0,0)")
-            .call(d3.axisTop(x).tickFormat(d3.format(".0%")));          
+          if (xmax == 0.05) {
+            svg.append("g")
+              .attr("transform", "translate(0,0)")
+              .call(d3.axisTop(x).tickFormat(d3.format(".0%")).ticks(5));                      
+          } else {
+            svg.append("g")
+              .attr("transform", "translate(0,0)")
+              .call(d3.axisTop(x).tickFormat(d3.format(".0%")));                      
+          }
         }
 
       if (this.selected == 'change' || this.selected == 'positivityrate') {
@@ -385,23 +393,26 @@ Vue.component('chart', {
       // Y axis
       var y = d3.scaleBand()
         .range([ 0, height ])
-        .domain(this.statedata.map(function(d) { return d.state; }))
+        .domain(this.statedata.map(function(d) { return d.district ? d.district : d.state; }))
         .padding(1);
 
       let yaxis = svg.append("g")
         .call(d3.axisLeft(y));
 
-      let abbreviations = this.abbreviations;
-      
-      let router = this.$router;
+      if (this.abbreviations) {
+        let abbreviations = this.abbreviations;
+        
+        let router = this.$router;
 
-      yaxis.selectAll('text').attr('fill', '#0070dd');
+        yaxis.selectAll('text').attr('fill', '#0070dd');
 
-      yaxis.selectAll('.tick')
-        .on('click', function (d) {
-          router.push(abbreviations[d]);
-        });
-      
+        yaxis.selectAll('.tick')
+          .on('click', function (d) {
+            router.push(abbreviations[d]);
+          });
+
+      }
+
 
       svg.append("text")
         .attr("class", "x label")
@@ -422,8 +433,8 @@ Vue.component('chart', {
           .append("line")
             .attr("x1", function(d) { return x(d.pastpositivityrate); })
             .attr("x2", function(d) { return x(d.pastpositivityrate); })
-            .attr("y1", function(d) { return y(d.state); })
-            .attr("y2", function(d) { return y(d.state); })
+            .attr("y1", function(d) { return y(d.district ? d.district : d.state); })
+            .attr("y2", function(d) { return y(d.district ? d.district : d.state); })
             .attr("stroke", "rgba(0,0,0,0.2)");
 
         // Circles of variable 1
@@ -432,7 +443,7 @@ Vue.component('chart', {
           .enter()
           .append("circle")
             .attr("cx", function(d) { return x(d.pastpositivityrate); })
-            .attr("cy", function(d) { return y(d.state); })
+            .attr("cy", function(d) { return y(d.district ? d.district : d.state); })
             .attr("r", "6")
             .style("fill", function(d) { return d.pastpositivityrate > 0.05 ? 'rgb(247,206,206)' : 'rgb(138, 217, 132)'; });
 
@@ -442,7 +453,7 @@ Vue.component('chart', {
           .enter()
           .append("circle")
             .attr("cx", function(d) { return x(d.pastpositivityrate); })
-            .attr("cy", function(d) { return y(d.state); })
+            .attr("cy", function(d) { return y(d.district ? d.district : d.state); })
             .attr("r", "6")
             .style("fill", function(d) { return d.pastpositivityrate > 0.05 ? 'crimson' : 'rgb(18,136,18)'; });
 
@@ -466,8 +477,8 @@ Vue.component('chart', {
           .append("line")
             .attr("x1", x(0))
             .attr("x2", x(0))
-            .attr("y1", function(d) { return y(d.state); })
-            .attr("y2", function(d) { return y(d.state); })
+            .attr("y1", function(d) { return y(d.district ? d.district : d.state); })
+            .attr("y2", function(d) { return y(d.district ? d.district : d.state); })
             .attr("stroke", "rgba(0,0,0,0.2)");
 
         // Circles
@@ -476,7 +487,7 @@ Vue.component('chart', {
           .enter()
           .append("circle")
             .attr("cx", x(0))
-            .attr("cy", function(d) { return y(d.state); })
+            .attr("cy", function(d) { return y(d.district ? d.district : d.state); })
             .attr("r", "6")
             .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : 'rgb(18,136,18)'; });
 
@@ -499,8 +510,8 @@ Vue.component('chart', {
           .append("line")
             .attr("x1", x(0))
             .attr("x2", x(0))
-            .attr("y1", function(d) { return y(d.state); })
-            .attr("y2", function(d) { return y(d.state); })
+            .attr("y1", function(d) { return y(d.district ? d.district : d.state); })
+            .attr("y2", function(d) { return y(d.district ? d.district : d.state); })
             .attr("stroke", "rgba(0,0,0,0.2)");
 
         // Circles
@@ -509,7 +520,7 @@ Vue.component('chart', {
           .enter()
           .append("circle")
             .attr("cx", x(0))
-            .attr("cy", function(d) { return y(d.state); })
+            .attr("cy", function(d) { return y(d.district ? d.district : d.state); })
             .attr("r", "6")
             .style("fill", function(d) { return 1000 * d.weeklytestspercapita < 10 ? 'crimson' : 'rgb(18,136,18)'; });
 
@@ -534,6 +545,17 @@ Vue.component('chart', {
   watch: {
     selected() {
       this.drawChart();
+    },
+
+    state() {
+      this.drawChart();
+    },
+
+  },
+
+  data() {
+    return {
+      mounted: false
     }
   }
 
@@ -961,6 +983,7 @@ const State = {
         </div>
       </div>
 
+
       <h1 style="text-align: center; margin-top: 0.5rem;">What Percentage of COVID Tests are Positive in {{state}}?</h1>
 
       <caveat></caveat>
@@ -987,7 +1010,11 @@ const State = {
         <br>
       </div>
 
-      <div v-if="districtDataForThisState.length > 0" style="margin-bottom: 1rem;">
+    </div>
+
+    <div v-if="districtDataForThisState.length > 0" style="margin-bottom: 1rem;">
+
+      <div class="container">
 
         <h2 id="districts">% Positive Tests Reported By {{state}} Districts<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
 
@@ -1013,18 +1040,36 @@ const State = {
           </table>
         </div>
 
-        <div v-if="viewMode == 'map'">
-          <statemap :state="selectedState"></statemap>
-        </div>
-
-        <br>
-        <p>District data updated on {{lastUpdatedDistrict}} using data reported by {{state}} to the <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a></p>
-
-        <pagemenu v-bind:view-mode.sync="viewMode"></pagemenu>
-
       </div>
 
+    </div>
 
+    <div v-if="viewMode == 'map'">
+      <statemap :state="selectedState" class="fullwidth"></statemap>
+    </div>
+
+    <div v-if="viewMode == 'chart'">
+
+      <div class="container">
+        <div style="display: flex; flex-direction: row; justify-content: center;">
+          <select v-model="selectedChart">
+            <option v-for="option in options" v-bind:value="option.value">
+              {{ option.text }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <chart :statedata="districtDataForThisState" :selected="selectedChart" :state="state" class="fullwidth"></chart>
+
+    </div>
+
+    <div class="container">
+      <p>District data updated on {{lastUpdatedDistrict}} using data reported by {{state}} to the <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a></p>
+      <pagemenu v-bind:view-mode.sync="viewMode"></pagemenu>
+    </div>
+
+    <div class="container">
 
       <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
         <router-link to="/">Home</router-link>
@@ -1124,7 +1169,12 @@ const State = {
         'district': false,
         'positivityrate': true,
         'change': false,
-      }
+      },
+      selectedChart: 'positivityrate',
+      options: [
+        { text: 'Percentage of Positive Tests', value: 'positivityrate' },
+        { text: 'Trend (1 week change)', value: 'change' },
+      ],
     }
   }
 
@@ -1204,7 +1254,6 @@ let app = new Vue({
       let [y, m, d] = lastUpdate.split('-');
       this.lastUpdatedDistrict = new Date(y,m - 1,d);
 
-      let lookback = 6; // change to 7
       let recentData = [];
 
       for (let state of this.states) {
@@ -1213,7 +1262,7 @@ let app = new Vue({
         for (let district of districts) {
           let districtData = stateData.filter(e => e['District'] == district);
           let recentTPR = parseFloat(districtData.slice(-1)[0]['Test Positivity Rate']);
-          let pastTPR = parseFloat(districtData.slice(-lookback-1,-lookback)[0]['Test Positivity Rate']);
+          let pastTPR = parseFloat(districtData.slice(-8,-7)[0]['Test Positivity Rate']);
 
           recentData.push({
             state: state,
