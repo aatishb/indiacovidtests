@@ -1,3 +1,289 @@
+Vue.component('statemap', {
+
+  props: ['state', 'abbreviation', 'statedata'],
+
+  template: `
+  <div>
+    <div id="statemap"></div>
+    <div id="blurb"></div>
+  </div>`,
+
+  methods: {
+    drawMap() {
+
+      if (this.state) {
+
+        d3.selectAll("#blurb #caption").remove();
+
+        // create a tooltip
+        var tooltip = d3.select("#blurb")
+          .append("div")
+          .attr("class", "tooltip")
+          .attr("id", "caption")
+          .style('border','2px solid rgb(40, 20, 70)')
+          .style('color','rgb(40, 20, 70)')
+          .style('background-color','lightgoldenrodyellow')
+          .style('max-width', '26rem')
+          .style('text-align', 'center')
+          .style("padding", "0.75rem")
+          .style("margin-top", "1rem")
+          .style("margin-left", "auto")
+          .style("margin-right", "auto")
+          .style("max-height", "3rem")
+          .style('transition', 'max-height 0.2s ease-in')
+          .style('-webkit-transition', 'max-height 0.2s ease-in')
+          .style('-moz-transition', 'max-height 0.2s ease-in')
+          .style('overflow', 'hidden')
+          .html("👉🏽 Hover/Click on a District for More Information");
+
+        // Three function that change the tooltip when user hover / move / leave a cell
+        var mouseover = function(state) {
+          if (state) {
+            tooltip.style("max-height", "7.5rem").html('<b>'+ state.district + "</b><br>% Positive Tests: <b>" + state.positivityratestring + '</b><br>Weekly Change: <b>' + state.changestring);
+          }
+        };
+
+
+        //Define map projection
+        var projection = d3.geoMercator()
+                .scale(1)
+                .translate([0, 0]);
+
+        //Define path generator
+        var path = d3.geoPath().projection(projection);
+
+        // set the dimensions and margins of the map
+        var margin = {top: 60, right: 150, bottom: 0, left: 0},
+            width = 700 - margin.left - margin.right,
+            height = 700 - margin.top - margin.bottom;
+
+        d3.selectAll("#statemap").selectAll("svg").remove();
+
+        var svg = d3.select("#statemap")
+          .append("svg")
+            .attr("viewBox", '0 0 ' + String(width + margin.left + margin.right) + ' ' + String(height + margin.top + margin.bottom))
+            .style('fill','transparent')
+            .style('stroke', 'rgba(0,0,51)')
+          .append("g")
+            .attr("transform",
+                  "translate(" + margin.left + "," + margin.top + ")");
+
+        svg.append("text")
+            .attr("class", "title")
+            .attr("text-anchor", "middle")
+            .attr("x", (margin.left + width + margin.right)/2)
+            .attr("y", -margin.top/4)
+            .text("What Percentage of COVID Tests are Positive in " + this.abbreviation + "?")
+            .style('fill', 'rgb(0,0,51)')
+            .style('stroke', 'none')
+            .style('font-size', '1.5rem')
+            .style('font-weight', '500')
+            .style("font-family", "serif");
+
+      // colour scale
+      var colors = d3.scaleQuantile()
+        .domain([0,0.35])
+        .range(['#ffffe0','#ffd59b','#ffa474','#f47461','#db4551','#b81b34','#8b0000']);
+
+
+      let legendSvg = svg.append("g")
+        .attr("class", "legendQuant")
+        .attr("fill", 'black')
+        .attr("stroke", 'none')
+        .attr("transform", "translate(" + String(width) + ","+ String(height * 0.33) +")");
+
+      var legend = d3.legendColor()
+        .labelFormat(d3.format(".0%"))
+        .labels(d3.legendHelpers.thresholdLabels)
+        .scale(colors);
+
+      legendSvg.call(legend);
+
+
+      let statename = this.state;
+      let statedata = this.statedata;
+      let districtNameMap = this.districtNameMap;
+      let stringify = this.stringify;
+
+      //Load in GeoJSON data
+      d3.json("../maps/IndianDistrictsTopoJSON.json", function(topology) {
+
+          let state = topojson.feature(topology, topology.objects[statename.toLowerCase().replaceAll(' and ',' ').replaceAll(' ', '') + '_district']);
+
+          // Calculate bounding box transforms for entire collection
+          var b = path.bounds( state ),
+          s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
+          t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+
+          // Update the projection    
+          projection
+                .scale(s)
+                .translate(t);
+
+          // rename map district names to those used by MOHFW
+          state.features.forEach(e => {
+            let district = e.properties.district;
+            if (Object.keys(districtNameMap).includes(district)) {
+              e.properties.district = districtNameMap[district];
+            }
+          });
+
+          let statedistricts = statedata.map(e => stringify(e.district));
+          let mapdistricts = state.features.map(e => e.properties.district);
+          for (let district of mapdistricts) {
+            if (!statedistricts.includes(stringify(district))) {
+              console.log('(possible name mismatch) missing data for', district);
+            }
+          }
+
+          //Bind data and create one path per GeoJSON feature
+          svg.selectAll("path")
+             .data(state.features)
+             .enter()
+             .append("path")
+             .attr("d", path)
+             .attr("class", d => 'id-'+stringify(d.properties.district))
+             .style("stroke", "black")
+            .attr("stroke-width", 1)
+             .style("fill", d => {
+              if (statedistricts.includes(stringify(d.properties.district))) {
+                return colors(statedata.filter(e => stringify(e.district) == stringify(d.properties.district))[0].positivityrate);
+              } else {
+                return 'none';
+              }
+          });
+
+          statedata.forEach(function(d) {
+            d3.selectAll("svg .id-" + stringify(d.district))
+              .on("mouseover", () => mouseover(d))
+              .on("click", () => mouseover(d));
+          });
+
+        });
+        
+        
+
+
+      }
+
+    },
+
+    stringify(string) {
+      return string.toLowerCase().replaceAll(' ','').replaceAll('.','');
+    },
+
+  },
+
+  watch: {
+    state() {
+      this.drawMap();
+    }
+  },
+
+  data() {
+    return {
+      districtNameMap: {
+        'South Andaman': 'South Andamans',
+        'Visakhapatnam': 'Visakhapatanam',
+        'S.P.S. Nellore': 'Spsr Nellore',
+        'Y.S.R. Kadapa': 'Y.S.R.',
+        'Upper Dibang Valley': 'Dibang Valley',
+        'Lepa Rada': 'Leparada',
+        'Morigaon': 'Marigaon',
+        'Kamrup Metropolitan': 'Kamrup Metro' ,
+        'South Salmara Mankachar': 'South Salmara Mancachar',
+        'West Champaran': 'Pashchim Champaran',
+        'East Champaran': 'Purbi Champaran',
+        'Kaimur': 'Kaimur (bhabua)',
+        'Aurangabad BR': 'Aurangabad',
+        'Uttar Bastar Kanker': 'Kanker',
+        'Dakshin Bastar Dantewada': 'Dantewada',
+        'Gariaband': 'Gariyaband',
+        'Kabeerdham': 'Kabirdham',
+        'Bametara': 'Bemetara',
+        'Bilaspur CT': 'Bemetara',
+        'Koriya': 'Korea',
+        'Balrampur CT': 'Balrampur',
+        'North Delhi': 'North',       
+        'North East Delhi': 'North East',       
+        'West Delhi': 'West',       
+        'East Delhi': 'East',       
+        'South West Delhi': 'South West',       
+        'Central Delhi': 'Central',       
+        'South Delhi': 'South',       
+        'South East Delhi': 'South East',       
+        'North West Delhi': 'North West',       
+        'Chhota Udaipur': 'Chhotaudepur',
+        'Banaskantha': 'Banas Kantha',
+        'Mehsana': 'Mahesana',
+        'Ahmedabad': 'Ahmadabad',
+        'Panchmahal': 'Panch Mahals',
+        'Dahod': 'Dohad',
+        'Aravalli': 'Arvalli',
+        'Sabarkantha': 'Sabar Kantha',
+        'Kutch': 'Kachchh',
+        'Charkhi Dadri': 'Charki Dadri',
+        'Hamirpur HP': 'Hamirpur',
+        'Bilaspur HP': 'Bilaspur',
+        'Punch': 'Poonch',
+        'Shopiyan': 'Shopian',
+        'Sahibganj': 'Sahebganj',
+        'Saraikela-Kharsawan': 'Saraikela Kharsawan',
+        'East Singhbhum': 'East Singhbum',
+        'Davanagere': 'Davangere',
+        'Leh': 'Leh Ladakh',
+        'Lakshadweep': 'Lakshadweep District',
+        'Khandwa': 'East Nimar',
+        'Aurangabad MH': 'Aurangabad',
+        'Ribhoi': 'Ri Bhoi',
+        'Jajpur': 'Jajapur',
+        'Subarnapur': 'Sonepur',
+        'Jagatsinghpur': 'Jagatsinghapur',
+        'Nabarangapur': 'Nabarangpur',      
+        'Angul': 'Anugul',
+        'Balasore': 'Baleshwar',
+        'Puducherry': 'Pondicherry',
+        'Ferozepur': 'Firozepur',
+        'Pratapgarh RJ': 'Pratapgarh',
+        'Nilgiris': 'The Nilgiris',
+        'Thoothukkudi': 'Tuticorin',
+        'Kanyakumari': 'Kanniyakumari',
+        'Viluppuram': 'Villupuram',
+        'Kancheepuram': 'Kanchipuram',
+        'Jagtial': 'Jagitial',
+        'Jangaon': 'Jangoan',
+        'Komaram Bheem': 'Kumuram Bheem Asifabad',
+        'Sipahijala': 'Sepahijala',
+        'Unokoti': 'Unakoti',
+        'Lakhimpur Kheri': 'Kheri',
+        'Shrawasti': 'Shravasti',
+        'Siddharthnagar': 'Siddharth Nagar',
+        'Kushinagar': 'Kushi Nagar',
+        'Sant Kabir Nagar': 'Sant Kabeer Nagar',
+        'Balrampur UP': 'Balrampur',
+        'Hamirpur UP': 'Hamirpur',
+        'Pratapgarh UP': 'Pratapgarh',
+        'Uttarkashi': 'Uttar Kashi',
+        'Rudraprayag': 'Rudra Prayag',
+        'Udham Singh Nagar': 'Udam Singh Nagar',
+        'South 24 Parganas': '24 Paraganas South',
+        'Paschim Medinipur': 'Medinipur West',
+        'Purba Medinipur': 'Medinipur East',
+        'Dakshin Dinajpur': 'Dinajpur Dakshin',
+        'Malda': 'Maldah',
+        'North 24 Parganas': '24 Paraganas North',
+        'Cooch Behar': 'Coochbehar',
+        'Uttar Dinajpur': 'Dinajpur Uttar',
+        'Lahaul and Spiti': 'Lahul And Spiti',
+      }
+    }
+  },
+
+  mounted() {
+    this.drawMap();
+  }
+});
+
 // map code adapted from https://bl.ocks.org/officeofjane/d33d6ef783993b60b15a3fe0f8da1481
 
 Vue.component('gridmap', {
@@ -14,6 +300,7 @@ Vue.component('gridmap', {
   `,
 
   methods: {
+
     toggle() { // todo: debounce
         this.g2r.toggle();
         if (this.g2r.mode == 'geo') {
@@ -137,7 +424,7 @@ Vue.component('gridmap', {
         if (state) {
           tooltip.style("max-height", "7.5rem").html('<b><a href="' +state.abbreviation+'">'+ state.state + "</a></b><br>% Positive Tests: <b>" + state.positivityratestring 
             + '</b><br>Weekly Change: <b>' + state.changestring
-            + '</b><br>Weekly Tests (per 1K people): <b>' + state.weeklytestspercapitastring) + '</b>';
+            + '</b><br>Weekly Tests (per 1K people): <b>' + state.weeklytestspercapitastring + '</b>');
         }
       };
 
@@ -166,7 +453,7 @@ Vue.component('gridmap', {
       let g2r = new geo2rect.draw();
       this.g2r = g2r;
 
-      d3.json('india.geojson', function(err, data){
+      d3.json('maps/india.geojson', function(err, data){
         var geojson = geo2rect.compute(data);
 
         g2r.config = config;
@@ -236,7 +523,7 @@ Vue.component('gridmap', {
 
 Vue.component('chart', {
   
-  props: ['statedata', 'selected', 'abbreviations'],
+  props: ['statedata', 'selected', 'abbreviations', 'state'],
 
   template: '<div id="chart"></div>',
 
@@ -261,13 +548,15 @@ Vue.component('chart', {
 
       let data = this.selected == 'weeklytestspercapita' ? this.statedata.sort((a,b) => parseFloat(b.weeklytestspercapita) - parseFloat(a.weeklytestspercapita)) : this.statedata.sort((a,b) => parseFloat(b.positivityrate) - parseFloat(a.positivityrate));
 
+      let numStates = this.statedata.length;
+
 
       // set the dimensions and margins of the chart
       var margin = {top: 50, right: 30, bottom: 10, left: 150},
           width = 500 - margin.left - margin.right,
-          height = 800 - margin.top - margin.bottom;
+          height = numStates*720/34 + 80 - margin.top - margin.bottom;
 
-      d3.selectAll("svg").remove();
+      d3.selectAll("#chart").selectAll("svg").remove();
 
       var svg = d3.select("#chart")
         .append("svg")
@@ -286,9 +575,15 @@ Vue.component('chart', {
             .attr("transform", "translate(0,0)")
             .call(d3.axisTop(x));
         } else {
-          svg.append("g")
-            .attr("transform", "translate(0,0)")
-            .call(d3.axisTop(x).tickFormat(d3.format(".0%")));          
+          if (xmax == 0.05) {
+            svg.append("g")
+              .attr("transform", "translate(0,0)")
+              .call(d3.axisTop(x).tickFormat(d3.format(".0%")).ticks(5));                      
+          } else {
+            svg.append("g")
+              .attr("transform", "translate(0,0)")
+              .call(d3.axisTop(x).tickFormat(d3.format(".0%")));                      
+          }
         }
 
       if (this.selected == 'change' || this.selected == 'positivityrate') {
@@ -303,23 +598,26 @@ Vue.component('chart', {
       // Y axis
       var y = d3.scaleBand()
         .range([ 0, height ])
-        .domain(this.statedata.map(function(d) { return d.state; }))
+        .domain(this.statedata.map(function(d) { return d.district ? d.district : d.state; }))
         .padding(1);
 
       let yaxis = svg.append("g")
         .call(d3.axisLeft(y));
 
-      let abbreviations = this.abbreviations;
-      
-      let router = this.$router;
+      if (this.abbreviations) {
+        let abbreviations = this.abbreviations;
+        
+        let router = this.$router;
 
-      yaxis.selectAll('text').attr('fill', '#0070dd');
+        yaxis.selectAll('text').attr('fill', '#0070dd');
 
-      yaxis.selectAll('.tick')
-        .on('click', function (d) {
-          router.push(abbreviations[d]);
-        });
-      
+        yaxis.selectAll('.tick')
+          .on('click', function (d) {
+            router.push(abbreviations[d]);
+          });
+
+      }
+
 
       svg.append("text")
         .attr("class", "x label")
@@ -340,8 +638,8 @@ Vue.component('chart', {
           .append("line")
             .attr("x1", function(d) { return x(d.pastpositivityrate); })
             .attr("x2", function(d) { return x(d.pastpositivityrate); })
-            .attr("y1", function(d) { return y(d.state); })
-            .attr("y2", function(d) { return y(d.state); })
+            .attr("y1", function(d) { return y(d.district ? d.district : d.state); })
+            .attr("y2", function(d) { return y(d.district ? d.district : d.state); })
             .attr("stroke", "rgba(0,0,0,0.2)");
 
         // Circles of variable 1
@@ -350,7 +648,7 @@ Vue.component('chart', {
           .enter()
           .append("circle")
             .attr("cx", function(d) { return x(d.pastpositivityrate); })
-            .attr("cy", function(d) { return y(d.state); })
+            .attr("cy", function(d) { return y(d.district ? d.district : d.state); })
             .attr("r", "6")
             .style("fill", function(d) { return d.pastpositivityrate > 0.05 ? 'rgb(247,206,206)' : 'rgb(138, 217, 132)'; });
 
@@ -360,7 +658,7 @@ Vue.component('chart', {
           .enter()
           .append("circle")
             .attr("cx", function(d) { return x(d.pastpositivityrate); })
-            .attr("cy", function(d) { return y(d.state); })
+            .attr("cy", function(d) { return y(d.district ? d.district : d.state); })
             .attr("r", "6")
             .style("fill", function(d) { return d.pastpositivityrate > 0.05 ? 'crimson' : 'rgb(18,136,18)'; });
 
@@ -384,8 +682,8 @@ Vue.component('chart', {
           .append("line")
             .attr("x1", x(0))
             .attr("x2", x(0))
-            .attr("y1", function(d) { return y(d.state); })
-            .attr("y2", function(d) { return y(d.state); })
+            .attr("y1", function(d) { return y(d.district ? d.district : d.state); })
+            .attr("y2", function(d) { return y(d.district ? d.district : d.state); })
             .attr("stroke", "rgba(0,0,0,0.2)");
 
         // Circles
@@ -394,7 +692,7 @@ Vue.component('chart', {
           .enter()
           .append("circle")
             .attr("cx", x(0))
-            .attr("cy", function(d) { return y(d.state); })
+            .attr("cy", function(d) { return y(d.district ? d.district : d.state); })
             .attr("r", "6")
             .style("fill", function(d) { return d.positivityrate > 0.05 ? 'crimson' : 'rgb(18,136,18)'; });
 
@@ -417,8 +715,8 @@ Vue.component('chart', {
           .append("line")
             .attr("x1", x(0))
             .attr("x2", x(0))
-            .attr("y1", function(d) { return y(d.state); })
-            .attr("y2", function(d) { return y(d.state); })
+            .attr("y1", function(d) { return y(d.district ? d.district : d.state); })
+            .attr("y2", function(d) { return y(d.district ? d.district : d.state); })
             .attr("stroke", "rgba(0,0,0,0.2)");
 
         // Circles
@@ -427,7 +725,7 @@ Vue.component('chart', {
           .enter()
           .append("circle")
             .attr("cx", x(0))
-            .attr("cy", function(d) { return y(d.state); })
+            .attr("cy", function(d) { return y(d.district ? d.district : d.state); })
             .attr("r", "6")
             .style("fill", function(d) { return 1000 * d.weeklytestspercapita < 10 ? 'crimson' : 'rgb(18,136,18)'; });
 
@@ -452,7 +750,12 @@ Vue.component('chart', {
   watch: {
     selected() {
       this.drawChart();
-    }
+    },
+
+    state() {
+      this.drawChart();
+    },
+
   }
 
 });
@@ -555,7 +858,7 @@ Vue.component('pagemenu', {
 
 // 1. Define route components.
 const Main = {
-  props: ['recentData', 'allData', 'abbreviations', 'districtData'],
+  props: ['recentData', 'allData', 'abbreviations', 'districtData', 'lastUpdatedDistrict'],
 
   template: `
   <div>
@@ -861,79 +1164,122 @@ Vue.component('graph', {
 
 
 const State = { 
-  props: ['recentData', 'allData', 'abbreviations', 'districtData'],
+  props: ['recentData', 'allData', 'abbreviations', 'districtData', 'lastUpdatedDistrict'],
 
   template: `
-  <div>
-    <div class="container">
+  <div class="container">
 
-      <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
-        <router-link to="/">Home</router-link>
-        <span style="font-size: 0.66rem;">▶︎</span>
-        <div class="line">
-          <select v-model="selectedState" @change="changeState" style="font-size: 0.9rem; width: 15.5rem; padding: 0.1rem; margin: 0rem;">
-            <option v-for="s in stateSelect" :value="s.value">
-              {{s.value}}
-            </option>
-          </select>
-        </div>
+    <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
+      <router-link to="/">Home</router-link>
+      <span style="font-size: 0.66rem;">▶︎</span>
+      <div class="line">
+        <select v-model="selectedState" @change="changeState" style="font-size: 0.9rem; width: 15.5rem; padding: 0.1rem; margin: 0rem;">
+          <option v-for="s in stateSelect" :value="s.value">
+            {{s.value}}
+          </option>
+        </select>
       </div>
-
-      <h1 style="text-align: center; margin-top: 0.5rem;">What Percentage of COVID Tests are Positive in {{state}}?</h1>
-
-      <caveat></caveat>
-
-      <ol style="margin-left: 1rem;">
-        <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#positivity">Share of Positive Tests</a></li>
-        <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#cases">Weekly Cases</a></li>
-        <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#tests">Weekly Tests</a></li>
-        <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#districts">District Level Data</a></li>
-      </ol>
+    </div>
 
 
-      <div v-if="stateTimeSeries">
-        <h2 id="positivity">Share of Positive Tests Reported By {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-        <p>Percentage of Positive Tests (as of {{lastStateUpdate}}): <b><span :style="{'color': parseFloat(recentStateData['Test Positivity Rate']) < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{(100 * parseFloat(recentStateData['Test Positivity Rate'])).toFixed(1) + '%'}}</span></b></p>
-        <p>The <b>Share of Positive Tests</b> is the <b>Weekly Cases</b> divided by the <b>Weekly Tests</b>.</p>
-        <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'Share of Positive Tests in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
-        <h2 id="cases">Weekly COVID Cases Reported By {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-        <p>Weekly COVID Cases (as of {{lastStateUpdate}}): <b>{{parseFloat(recentStateData['Weekly Cases']).toLocaleString()}}</b></p>
-        <graph :data="stateTimeSeries" metric="Weekly Cases" :title="'Weekly COVID Cases in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
-        <h2 id="tests">Weekly COVID Tests Reported By {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-        <p>Weekly COVID Tests (as of {{lastStateUpdate}}): <b>{{parseFloat(recentStateData['Weekly Tests']).toLocaleString()}}</b></p>
-        <graph :data="stateTimeSeries" metric="Weekly Tests" :title="'Weekly COVID Tests in ' + state" stroke="black" fill="rgba(0,255,0,0.2)"></graph>
-        <br>
-      </div>
+    <h1 style="text-align: center; margin-top: 0.5rem;">What Percentage of COVID Tests are Positive in {{state}}?</h1>
 
-      <div v-if="districtDataForThisState.length > 0" style="margin-bottom: 1rem;">
-        <h2 id="districts">% Positive Tests Reported By {{state}} Districts<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+    <caveat></caveat>
+
+    <ol style="margin-left: 1rem;">
+      <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#positivity">Share of Positive Tests</a></li>
+      <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#cases">Weekly Cases</a></li>
+      <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#tests">Weekly Tests</a></li>
+      <li><span style="font-size: 0.66rem;">▶︎</span> <a href="#districts">District Level Data</a></li>
+    </ol>
+
+
+    <div v-if="recentStateData">
+      <h2 id="positivity">Share of Positive Tests Reported By {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+      <p>Percentage of Positive Tests (as of {{lastStateUpdate}}): <b><span :style="{'color': parseFloat(recentStateData['Test Positivity Rate']) < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{(100 * parseFloat(recentStateData['Test Positivity Rate'])).toFixed(1) + '%'}}</span></b></p>
+      <p>The <b>Share of Positive Tests</b> is the <b>Weekly Cases</b> divided by the <b>Weekly Tests</b>.</p>
+      <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'Share of Positive Tests in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
+      <h2 id="cases">Weekly COVID Cases Reported By {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+      <p>Weekly COVID Cases (as of {{lastStateUpdate}}): <b>{{parseFloat(recentStateData['Weekly Cases']).toLocaleString()}}</b></p>
+      <graph :data="stateTimeSeries" metric="Weekly Cases" :title="'Weekly COVID Cases in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
+      <h2 id="tests">Weekly COVID Tests Reported By {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+      <p>Weekly COVID Tests (as of {{lastStateUpdate}}): <b>{{parseFloat(recentStateData['Weekly Tests']).toLocaleString()}}</b></p>
+      <graph :data="stateTimeSeries" metric="Weekly Tests" :title="'Weekly COVID Tests in ' + state" stroke="black" fill="rgba(0,255,0,0.2)"></graph>
+      <br>
+    </div>
+
+
+    <div v-if="districtDataForThisState.length > 0" style="margin-bottom: 1rem;">
+
+
+      <h2 id="districts">% Positive Tests Reported By {{state}} Districts<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
+
+      <pagemenu v-bind:view-mode.sync="viewMode"></pagemenu>
+
+      <div v-if="viewMode == 'table'">
         <table>
           <tr>
             <th class="columntitle" @click="changekey('district')"><b>District</b> <span v-if="key == 'district'">{{(sortorder[key]) ? '▼' : '▲'}}</span></th>
-            <th class="columntitle" @click="changekey('positivityrate')"><b>% Positive Tests</b> <span v-if="key == 'positivityrate'">{{(sortorder[key]) ? '▼' : '▲'}}</span> <br><span class="light">(6 day average)</span></th>
+            <th class="columntitle" @click="changekey('positivityrate')"><b>% Positive Tests</b> <span v-if="key == 'positivityrate'">{{(sortorder[key]) ? '▼' : '▲'}}</span> <br><span class="light">(1 week average)</span></th>
+            <th class="columntitle" @click="changekey('change')"><b>Trend</b> <span v-if="key == 'change'">{{(sortorder[key]) ? '▼' : '▲'}}</span> <br><span class="light">(1 week change)</span></th>
           </tr>
           <tr v-for="(district,i) in sort(districtDataForThisState, key)" :key="i">
             <td>{{district.district}}</td>
             <td :style="{'color': district.positivityrate < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{district.positivityratestring}}</td>
+            <td>
+              <span :style="{color: district.change > 0 ? 'crimson' : 'rgb(70, 130, 65)'}" v-if="Math.round(Math.abs(100*district.change)) > 0">
+                <b>{{district.change > 0 ? '▲' : '▼'}}</b> {{district.changestring}}
+              </span>
+              <span v-else><span style="vertical-align: -0.25rem; super; font-size: 1.75rem;">≈</span> {{district.changestring}}</span>
+            </td>
           </tr>
         </table>
-        <br>
-        <p>Table updated on {{lastDistrictUpdate}} using data reported by {{state}} to the <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a></p>
       </div>
 
+      <div v-else-if="viewMode == 'chart'">
 
-      <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
-        <router-link to="/">Home</router-link>
-        <span style="font-size: 0.66rem;">▶︎</span>
-        <div class="line">
-          <select v-model="selectedState" @change="changeState" style="font-size: 0.9rem; width: 15.5rem; padding: 0.1rem; margin: 0rem;">
-            <option v-for="s in stateSelect" :value="s.value">
-              {{s.value}}
+        <div v-if="districtDataForThisState.length > 2">
+          <div style="display: flex; flex-direction: row; justify-content: center;">
+            <select v-model="selectedChart">
+              <option v-for="option in options" v-bind:value="option.value">
+                {{ option.text }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <chart :statedata="districtDataForThisState" :selected="selectedChart" :state="state"></chart>
+
+        <div style="display: flex; flex-direction: row; justify-content: center;">
+          <select v-model="selectedChart">
+            <option v-for="option in options" v-bind:value="option.value">
+              {{ option.text }}
             </option>
           </select>
         </div>
+
       </div>
 
+      <div v-else-if="viewMode == 'map'">
+        <statemap :state="selectedState" :abbreviation="abbreviation" :statedata="districtDataForThisState"></statemap>
+      </div>
+
+      <br>
+      <p>District data updated on {{lastStateUpdate}} using data reported by {{state}} to the <a href="https://www.mohfw.gov.in/">Indian Ministry of Health</a></p>
+      <pagemenu v-bind:view-mode.sync="viewMode"></pagemenu>
+    </div>
+
+
+    <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;">
+      <router-link to="/">Home</router-link>
+      <span style="font-size: 0.66rem;">▶︎</span>
+      <div class="line">
+        <select v-model="selectedState" @change="changeState" style="font-size: 0.9rem; width: 15.5rem; padding: 0.1rem; margin: 0rem;">
+          <option v-for="s in stateSelect" :value="s.value">
+            {{s.value}}
+          </option>
+        </select>
+      </div>
     </div>
 
   </div>
@@ -944,6 +1290,10 @@ const State = {
       let state = Object.keys(this.abbreviations).filter(e => this.abbreviations[e] == this.$route.params.id)[0];
       this.selectedState = state;
       return state;
+    },
+
+    abbreviation() {
+      return this.abbreviations[this.state];
     },
 
     states() {
@@ -968,8 +1318,7 @@ const State = {
     },
 
     lastStateUpdate() {
-      let [y, m, d] = this.recentStateData['Date'].split('-');
-      return new Date(y,m - 1,d).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});      
+      return this.lastUpdatedDistrict.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});      
     },
 
     abbreviation() {
@@ -981,17 +1330,8 @@ const State = {
     },
 
     districtDataForThisState() {
-      return this.districtData.filter(e => e['State'] == this.state.toUpperCase()).map(e => ({
-        district: e['District'].split(' ').filter(e => e.length > 0).map(e => e.includes('.') ? e : e[0].toUpperCase() + e.toLowerCase().substr(1)).join(' '),
-        positivityrate: parseFloat(e['Test Positivity Rate']),
-        positivityratestring: (100 * parseFloat(e['Test Positivity Rate'])).toFixed(1) + '%',
-      }));
+      return this.districtData.filter(e => e.state == this.state);
     },
-
-    lastDistrictUpdate() {
-      let [y, m, d] = this.districtData.slice(-1)[0]['Date'].split('-');
-      return new Date(y,m - 1,d).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});      
-    }
 
   },
 
@@ -1022,12 +1362,19 @@ const State = {
   },
   data() {
     return {
+      viewMode: 'chart',
       selectedState: '',
       key: 'positivityrate',
       sortorder: {
         'district': false,
         'positivityrate': true,
-      }
+        'change': false,
+      },
+      selectedChart: 'change',
+      options: [
+        { text: 'Percentage of Positive Tests', value: 'positivityrate' },
+        { text: 'Trend (1 week change)', value: 'change' },
+      ],
     }
   }
 
@@ -1107,9 +1454,29 @@ let app = new Vue({
       let [y, m, d] = lastUpdate.split('-');
       this.lastUpdatedDistrict = new Date(y,m - 1,d);
 
-      let districtData = data.filter(e => e['Date'] == lastUpdate);
+      let recentData = [];
 
-      this.districtData = districtData;
+      for (let state of this.states) {
+        let stateData = data.filter(e => e['State'] == state.toUpperCase());
+        let districts = stateData.filter(e => e['Date'] == lastUpdate).map(e => e['District']);
+        for (let district of districts) {
+          let districtData = stateData.filter(e => e['District'] == district);
+          let recentTPR = parseFloat(districtData.slice(-1)[0]['Test Positivity Rate']);
+          let pastTPR = parseFloat(districtData.slice(-8,-7)[0]['Test Positivity Rate']);
+
+          recentData.push({
+            state: state,
+            district: district.split(' ').filter(e => e.length > 0).map(e => e.includes('.') ? e : e[0].toUpperCase() + e.toLowerCase().substr(1)).join(' '),
+            positivityrate: recentTPR,
+            positivityratestring: (100 * recentTPR).toFixed(1) + '%',
+            pastpositivityrate: pastTPR,
+            change: recentTPR - pastTPR,
+            changestring: ((100 * (recentTPR - pastTPR)).toFixed(1) + '%').replace('-','−'), //long minus sign     
+          });
+        }
+      }
+
+      this.districtData = recentData;
 
     });
 
@@ -1201,6 +1568,7 @@ let app = new Vue({
     recentData: [],
     districtData: [],
     lastUpdated: new Date(),
+    lastUpdatedDistrict: new Date(),
   }
 
 });

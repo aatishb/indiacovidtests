@@ -11,6 +11,7 @@
   <script src="libraries/turf.min.js" defer></script>
   <script src="libraries/geo2rect.min.js" defer></script>
   <script src="libraries/d3-legend.min.js" defer></script>
+  <script src="libraries/topojson.min.js"></script>
   <link rel="stylesheet" type="text/css" href="normalize.css">
   <link rel="stylesheet" type="text/css" href="style.css">
 
@@ -24,7 +25,7 @@
       <div><a href="https://aatishb.com/indiacovidtests/about.html">About</a></div>
     </header>
 
-    <router-view :recent-data="recentData" :all-data="allData" :abbreviations="abbreviations" :district-data="districtData"></router-view>
+    <router-view :recent-data="recentData" :all-data="allData" :abbreviations="abbreviations" :district-data="districtData" :last-updated-district="lastUpdatedDistrict"></router-view>
 
     <footer>
       <div class="container">
