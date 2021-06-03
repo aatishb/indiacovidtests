@@ -1196,14 +1196,14 @@ const State = {
 
     <div v-if="recentStateData">
       <h2 id="positivity">Share of Positive Tests Reported By {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-      <p>Percentage of Positive Tests (as of {{lastStateUpdate}}): <b><span :style="{'color': parseFloat(recentStateData['Test Positivity Rate']) < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{(100 * parseFloat(recentStateData['Test Positivity Rate'])).toFixed(1) + '%'}}</span></b></p>
+      <p>Percentage of Positive Tests (updated {{lastStateUpdateShort}}): <b><span :style="{'color': parseFloat(recentStateData['Test Positivity Rate']) < 0.05 ? 'rgb(18,136,18)' : 'crimson'}">{{(100 * parseFloat(recentStateData['Test Positivity Rate'])).toFixed(1) + '%'}}</span></b></p>
       <p>The <b>Share of Positive Tests</b> is the <b>Weekly Cases</b> divided by the <b>Weekly Tests</b>.</p>
       <graph :data="stateTimeSeries" metric="Test Positivity Rate" :title="'Share of Positive Tests in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
       <h2 id="cases">Weekly COVID Cases Reported By {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-      <p>Weekly COVID Cases (as of {{lastStateUpdate}}): <b>{{parseFloat(recentStateData['Weekly Cases']).toLocaleString()}}</b></p>
+      <p>Weekly COVID Cases (updated {{lastStateUpdateShort}}): <b>{{parseFloat(recentStateData['Weekly Cases']).toLocaleString()}}</b></p>
       <graph :data="stateTimeSeries" metric="Weekly Cases" :title="'Weekly COVID Cases in ' + state" stroke="black" fill="rgba(255,0,0,0.2)"></graph>
       <h2 id="tests">Weekly COVID Tests Reported By {{state}}<sup><a href="#caveat" style="font-size: 0.75rem; text-decoration: none; vertical-align: 0.5rem">⚠️</a></sup></h2>
-      <p>Weekly COVID Tests (as of {{lastStateUpdate}}): <b>{{parseFloat(recentStateData['Weekly Tests']).toLocaleString()}}</b></p>
+      <p>Weekly COVID Tests (updated {{lastStateUpdateShort}}): <b>{{parseFloat(recentStateData['Weekly Tests']).toLocaleString()}}</b></p>
       <graph :data="stateTimeSeries" metric="Weekly Tests" :title="'Weekly COVID Tests in ' + state" stroke="black" fill="rgba(0,255,0,0.2)"></graph>
       <br>
     </div>
@@ -1319,6 +1319,10 @@ const State = {
 
     lastStateUpdate() {
       return this.lastUpdatedDistrict.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});      
+    },
+
+    lastStateUpdateShort() {
+      return this.lastUpdatedDistrict.toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});      
     },
 
     abbreviation() {
